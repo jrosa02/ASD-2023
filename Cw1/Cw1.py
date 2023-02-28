@@ -74,13 +74,12 @@ m3 = macierz((2, 3), 1)
 
 def determinant(matrix: macierz, b: float  = 1, depth = 1):
     rows, cols = matrix.size()
-    print(b)
-    print(matrix)
     if rows != cols:
         raise BaseException()
     if rows < 2:
         return matrix[0][0] / b
     else:
+        
         new_matrix = [[0 for _ in range(rows-1)] for _ in range(cols-1)]
         for i in range(rows-1):
             for j in range(cols - 1):
