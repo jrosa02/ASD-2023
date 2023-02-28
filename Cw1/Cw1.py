@@ -47,11 +47,11 @@ class macierz:
 
 def T(matrix: macierz):
     rows, cols = matrix.size()
-    new_matrix = macierz((cols, rows))
-    for i in range(cols):
-        for j in range(rows):
-            new_matrix[i][j] += matrix[j][i]
-    return new_matrix
+    T_matrix = [[0 for _ in range(rows)] for _ in range(cols)]
+    for col_i in range(cols):
+        for row_i in range(rows):
+            T_matrix[col_i][row_i] += matrix[row_i][col_i]
+    return macierz(T_matrix)
 
 m1 = macierz(
 [ [1, 0, 2],
@@ -64,11 +64,48 @@ m2 = macierz(
   [1, 0]]
 )
 
-m3 = macierz((2, 3))
+m3 = macierz((2, 3), 1)
 
-if __name__ == "__main__":
-    print(m1.size())
-    print(m1[0][0])
-    print(m1 + m1)
-    print(m1 * m2)
-    print(T(m2))
+#print(T(m1))
+#print(m1 + m3)
+#print(m1 *m2)
+
+
+
+def determinant(matrix: macierz, b: float  = 1, depth = 1):
+    rows, cols = matrix.size()
+    print(b)
+    print(matrix)
+    if rows != cols:
+        raise BaseException()
+    if rows < 2:
+        return matrix[0][0] / b
+    else:
+        new_matrix = [[0 for _ in range(rows-1)] for _ in range(cols-1)]
+        for i in range(rows-1):
+            for j in range(cols - 1):
+                new_matrix[i][j] = matrix[0][0]*matrix[i+1][j+1] - matrix[i+1][0]*matrix[0][j+1]
+        b *= matrix[0][0]**(rows-2)
+        new_matrix = macierz(new_matrix)
+    return determinant(new_matrix, b, depth=depth+1)
+
+
+m4 = macierz([
+[5 , 1 , 1 , 2 , 3],
+[4 , 2 , 1 , 7 , 3],
+[2 , 1 , 2 , 4 , 7],
+[9 , 1 , 0 , 7 , 0],
+[1 , 4 , 7 , 2 , 2]
+])
+
+m5 = macierz(  [
+     [0 , 1 , 1 , 2 , 3],
+     [4 , 2 , 1 , 7 , 3],
+     [2 , 1 , 2 , 4 , 7],
+     [9 , 1 , 0 , 7 , 0],
+     [1 , 4 , 7 , 2 , 2]
+    ])
+
+print(determinant(m4))
+print(determinant(m5))
+
