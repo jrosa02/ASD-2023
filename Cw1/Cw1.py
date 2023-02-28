@@ -12,3 +12,6 @@ class matrix:
 
     def __str__():
         pass
+
+    def __getitem__():
+        pass
