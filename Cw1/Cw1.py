@@ -1,8 +1,11 @@
-from typing import List
+from typing import List, Tuple
 
 class macierz:
-    def __init__(self, matrix):
-        self.__matrix_ = matrix
+    def __init__(self, matrix, val = 0):
+        if(isinstance(matrix, List)):
+            self.__matrix_ = matrix
+        if(isinstance(matrix, Tuple)):
+            self.__matrix_ = [[val] * matrix[1]] * matrix[0]
 
     def __getitem__(self, cord):
         return self.__matrix_[cord]
@@ -41,12 +44,14 @@ class macierz:
     def size(self):
         return (len(self.__matrix_), len(self.__matrix_[0]))
     
-    def T(self):
-        new_matrix = []
-        for row_i in range(self.size()[0]):
-            for col_i in range(self.size()[1]):
-                pass
 
+def T(matrix: macierz):
+    new_matrix = macierz((matrix.size()[1], matrix.size()[0]))
+    for row_i in range(matrix.size()[0]):
+        for col_i in range(matrix.size()[1]):
+            new_matrix[col_i][row_i] += matrix[row_i][col_i]
+            print(new_matrix[col_i][row_i])
+    return(new_matrix)
 
 m1 = macierz(
 [ [1, 0, 2],
@@ -59,6 +64,10 @@ m2 = macierz(
   [1, 0]]
 )
 
-print(m1.size())
-print(m1[0][0])
-print(m1 * m2)
+m3 = macierz((2, 3))
+
+if __name__ == "__main__":
+    print(m1.size())
+    print(m1[0][0])
+    print(m1 * m2)
+    print(T(m2))
