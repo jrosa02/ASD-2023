@@ -46,12 +46,12 @@ class macierz:
     
 
 def T(matrix: macierz):
-    new_matrix = macierz((matrix.size()[1], matrix.size()[0]))
-    for row_i in range(matrix.size()[0]):
-        for col_i in range(matrix.size()[1]):
-            new_matrix[col_i][row_i] += matrix[row_i][col_i]
-            print(new_matrix[col_i][row_i])
-    return(new_matrix)
+    rows, cols = matrix.size()
+    new_matrix = macierz((cols, rows))
+    for i in range(cols):
+        for j in range(rows):
+            new_matrix[i][j] += matrix[j][i]
+    return new_matrix
 
 m1 = macierz(
 [ [1, 0, 2],
@@ -69,5 +69,6 @@ m3 = macierz((2, 3))
 if __name__ == "__main__":
     print(m1.size())
     print(m1[0][0])
+    print(m1 + m1)
     print(m1 * m2)
     print(T(m2))
