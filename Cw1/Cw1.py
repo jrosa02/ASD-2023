@@ -40,6 +40,12 @@ class macierz:
 
     def size(self):
         return (len(self.__matrix_), len(self.__matrix_[0]))
+    
+    def T(self):
+        new_matrix = []
+        for row_i in range(self.size()[0]):
+            for col_i in range(self.size()[1]):
+                pass
 
 
 m1 = macierz(
