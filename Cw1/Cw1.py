@@ -1,4 +1,3 @@
-import copy
 from typing import List, Tuple
 
 class macierz:
@@ -87,7 +86,8 @@ print(m1 *m2)
 
 
 def determinant(matrix: macierz, b: float  = 1, depth = 1):
-    matrix = copy.copy(matrix)
+    if not isinstance(matrix, macierz):
+        raise BaseException("determinant function error, matrix is not a macierz")
     rows, cols = matrix.size()
     if rows != cols:
         raise BaseException()
