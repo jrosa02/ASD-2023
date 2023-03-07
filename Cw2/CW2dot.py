@@ -40,11 +40,26 @@ class linked_list:
 
     def __add__(self, data):
         """metoda dodająca na początek listy (jako argument ma dostać dane, które wstawi do pola data tworzonego przez tę funkcję elementu listy)"""
-        self.head_ = element(data, self.head_ , self.tail_)
+        if self.is_empty():
+            elem = element(data, None, None)
+            self.head_ = elem
+            self.tail_ = elem
+        else:
+            elem = element(data, self.head_ , None)
+            self.head_ = elem
+            self.head_.next_.prev_ = elem
 
     def append(self, data):
         """metoda dodająca na koniec listy (argument taki sam jak w add)"""
-        self.tail_ = element(data, None , self.tail_.prev_)
+        if self.is_empty():
+            elem = element(data, None, None)
+            self.head_ = elem
+            self.tail_ = elem
+        else:
+            elem = element(data, None , self.tail_)
+            self.tail_ = elem
+            self.tail_.prev_.next_ = elem
+
         
 
     def remove(self):
@@ -60,15 +75,12 @@ class linked_list:
     def remove_end(self):
         """metoda usuwająca element z końca listy"""
         if self.is_empty():
-            return None
-        if self.head_.next_ is None:
-            self.head_ = None
-            return None
-        el: element = self.head_
-        while(el.next_.next_ != None):
-            el = el.next_
-        el.next_ = None
-        self.tail_ = el
+            return
+        if self.tail_.prev_ is None:
+            self.tail_ = None
+        else:
+            self.tail_.prev_.next_ = None
+            self.tail_ = self.tail_.prev_
 
 
 
@@ -92,6 +104,7 @@ if __name__ == "__main__":
         ('PG', 'Gdańsk', 1945)]
     
     uczelnie = linked_list()
+    print(uczelnie)
     for elem in prot:
         uczelnie.__add__(elem)
     print(uczelnie)
