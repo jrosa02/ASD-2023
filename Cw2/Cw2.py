@@ -102,3 +102,7 @@ if __name__ == "__main__":
     print(uczelnie.get())
     uczelnie.remove_end()
     print(uczelnie)
+    uczelnie.destroy()
+    print(uczelnie.is_empty())
+    uczelnie.remove()
+    uczelnie.remove_end()
