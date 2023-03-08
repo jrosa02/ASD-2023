@@ -105,8 +105,12 @@ if __name__ == "__main__":
     
     uczelnie = linked_list()
     print(uczelnie)
-    for elem in prot:
-        uczelnie.__add__(elem)
+    uczelnie.append(prot[0])
+    uczelnie.append(prot[1])
+    uczelnie.append(prot[2])
+    uczelnie.__add__(prot[3])
+    uczelnie.__add__(prot[4])
+    uczelnie.__add__(prot[5])
     print(uczelnie)
     print(len(uczelnie))
     uczelnie.remove()
