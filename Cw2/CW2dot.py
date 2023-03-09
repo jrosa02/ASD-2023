@@ -14,6 +14,8 @@ class linked_list:
 
     def destroy(self):
         """usunięcie/zniszczenie całej listy - tu też jest łatwo - wystarczy ustawić head na None, a Python sam zwolni pamięć :)"""
+        if not self.head_.next_ is None:
+            self.head_.next_.prev_ = None
         self.head_ = None
         self.tail_ = None
 
