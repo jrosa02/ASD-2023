@@ -16,16 +16,19 @@ class element:
             return elem.tab_[index]
 
     def insert(self, data, index: int):
-        if len(self.tab_) < size:
-            if index >= len(self.tab_):
-                self.tab_.append(data)
-            elif index < len(self.tab_):
-                self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
-        elif len(self.tab_) >= size:
-            if self.next_ is None:
-                self.next_ = element(next= None, data= self.tab_[size//2:])
-                self.tab_ = self.tab_[:size//2]
-        
+        """wstawiająca daną w miejscu wskazanym przez podany indeks, przesuwając istniejące elementy w prawo;
+        jeżeli tablica elementu w którym ma nastąpić wstawienie jest pełna to do listy dokładany jest nowy element, 
+        połowa zapełnionej tablicy jest przenoszona do nowego elementu i wstawienie danej 
+        zachodzi albo w opróżnianym elemencie albo we wstawianym (w zależności gdzie 'wypada' miejsce wskazane przez indeks). 
+        Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
+        if len(self.tab_) < size and index < len(self.tab_):
+            self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
+        if len(self.tab_) < size and index >= len(self.tab_):
+            self.tab_.append(data)
+
+        if
+        self.next_ = element(next= None, data= self.tab_[size//2:])
+        self.tab_ = self.tab_[:size//2]
             
 
     def delete(self, index: int):
