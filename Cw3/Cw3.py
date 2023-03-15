@@ -1,3 +1,7 @@
+def realloc(tab, size):
+    oldSize = len(tab)
+    return [tab[i] if i<oldSize else None  for i in range(size)]
+
 class Kolejka:
     def __init__(self) -> None:
         self.size = 5
@@ -28,11 +32,6 @@ class Kolejka:
                 self.read_idx_ += 1
             return a
         
-    def realloc(self):
-        self.tab_= [self.tab_[i] for i in range(self.write_idx_)] + [None for _ in range(self.size)] + [self.tab_[i] for i in range(self.write_idx_, self.size)]
-        self.read_idx_ += self.size
-        self.size = len(self.tab_)
-        
     def enqueue(self, data):
         self.tab_[self.write_idx_] = data
         if self.write_idx_ == self.size-1:
@@ -40,7 +39,10 @@ class Kolejka:
         else:
             self.write_idx_ += 1
         if self.is_empty():
-            self.realloc()
+            realloc(self.tab_, self.size * 2)
+            self.tab_= [self.tab_[i] for i in range(self.write_idx_)] + [None for _ in range(self.size)] + [self.tab_[i] for i in range(self.write_idx_, self.size)]
+            self.read_idx_ += self.size
+            self.size = len(self.tab_)
 
 
     def __str__(self):
@@ -72,6 +74,7 @@ if __name__ == "__main__":
     print(kolej.peek())
     print(kolej)
     for i in range(4):
+        kolej.debug()
         kolej.enqueue(i+5)
     kolej.debug()
     while( not kolej.is_empty()):
