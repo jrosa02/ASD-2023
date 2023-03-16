@@ -22,26 +22,31 @@ class element:
         połowa zapełnionej tablicy jest przenoszona do nowego elementu i wstawienie danej 
         zachodzi albo w opróżnianym elemencie albo we wstawianym (w zależności gdzie 'wypada' miejsce wskazane przez indeks). 
         Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
+
+        print("Inserting")
+        print(index)
         if index < size:
+            print("index < size")
             if self.tab_[index] is None:
                 self.tab_[index] = data
-                #print("zastap None")
+                print("zastap None")
             else:
                 self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
-                #print("wstaw i rozson")
+                print("wstaw i rozson")
                 if self.tab_[-1] is None:
-                    #print("usun None")
+                    print("usun None")
                     self.tab_.pop()
         elif self.tab_[-1] is None and self.next_ is None:
-                #print("append")
+                print("append")
                 i =0 
                 if self.tab_[0] is not None:
                     while self.tab_[i] is not None:
                         i+=1    
                 self.tab_[i] = data
-        if index >= size and self.tab_[-1] is not None:
+        if index >= size:
+            print("To next elem")
             if self.next_ is None:
-                #print("nowy element")
+                print("nowy element")
                 lst = [data]
                 self.next_ = element(next= None, datalist=[data])
             elif self.next_ is not None:
@@ -49,14 +54,14 @@ class element:
 
 
         #Przed dodaniem rozsuwania wszystko było o wiele bardziej
-        # if len(self.tab_) > size:
-        #     elems: element = element(next=self.next_, datalist= self.tab_[size//2:])
-        #     tabl: list= [None for _ in range(size)]
-        #     if self.tab_[:size//2] is not None:
-        #         for i in range(len(self.tab_[:size//2])):
-        #             tabl[i] = self.tab_[:size//2][i]
-        #     self.tab_ = tabl
-        #     self.next_ = elems
+        if len(self.tab_) > size:
+            elems: element = element(next=self.next_, datalist= self.tab_[size//2:])
+            tabl: list= [None for _ in range(size)]
+            if self.tab_[:size//2] is not None:
+                for i in range(len(self.tab_[:size//2])):
+                    tabl[i] = self.tab_[:size//2][i]
+            self.tab_ = tabl
+            self.next_ = elems
 
             
 
@@ -86,7 +91,7 @@ if __name__ == "__main__":
     for i in range(0,10):
         elem.insert(data = i, index = i)
         elem.debug()
-    print("Getting" + str(elem.get(4)))
+    print("Getting: " + str(elem.get(4)))
     elem.insert(10,1)
     elem.insert(11,8)
     print("Random insert")
