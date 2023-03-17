@@ -84,8 +84,6 @@ class element:
         self.delete_overflow()
 
 
-        
-
     def delete(self, index: int):
         """ usuwająca  daną spod podanego indeksu 
         - dodatkowo jeżeli tablica jest zapełniona mniej niż w połowie z następnego elementu listy jest do niej przenoszony pierwszy element tablicy;
@@ -107,6 +105,7 @@ class element:
                 elem.tab_ = elem.nononetab() + elem.next_.nononetab() + [None for _ in range(capacity - len(elem) - len(elem.next_))]
                 elem.next_ = elem.next_.next_
 
+
     def __str__(self):
         out = "-----------------------------------\n"
         out += str(self.tab_) + "\n"
@@ -116,6 +115,7 @@ class element:
             out += "->" + str(elem.tab_) + "\n"
         out += ("-----------------------------------")
         return out
+
 
     def debug(self):
         print(self)
