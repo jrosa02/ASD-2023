@@ -1,20 +1,27 @@
-size = 0
+capacity = 0
+
 
 class element:
     def __init__(self, next = None, datalist: list = None) -> None:
-        self.tab_: list= [None for _ in range(size)]
+        print("Eleme init")
+        self.tab_: list= [None for _ in range(capacity)]
         if datalist is not None:
             for i in range(len(datalist)):
                 self.tab_[i] = datalist[i]
         self.next_: element = next
+        print(self.tab_)
+
+    def __len__(self):
+        return len([i for i in self.tab_ if i is not None])
             
     def get(self, index: int):
         elem = self
-        while index >= len(elem.tab_) and elem.next_ is not None:
-            index -= len(elem.tab_)
+        while index >= len(elem) and elem.next_ is not None:
+            index -= len(elem)
             elem = elem.next_
         if elem is not None:
             return elem.tab_[index]
+        
 
     def insert(self, data, index: int):
         """wstawiająca daną w miejscu wskazanym przez podany indeks, przesuwając istniejące elementy w prawo;
@@ -24,9 +31,8 @@ class element:
         Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
 
         print("Inserting")
-        print(index)
-        if index < size:
-            print("index < size")
+        if index < capacity:
+            print("index < cap")
             if self.tab_[index] is None:
                 self.tab_[index] = data
                 print("zastap None")
@@ -41,9 +47,9 @@ class element:
                 i =0 
                 if self.tab_[0] is not None:
                     while self.tab_[i] is not None:
-                        i+=1    
+                        i+=1
                 self.tab_[i] = data
-        if index >= size:
+        if index >= capacity:
             print("To next elem")
             if self.next_ is None:
                 print("nowy element")
@@ -54,16 +60,14 @@ class element:
 
 
         #Przed dodaniem rozsuwania wszystko było o wiele bardziej
-        if len(self.tab_) > size:
-            elems: element = element(next=self.next_, datalist= self.tab_[size//2:])
-            tabl: list= [None for _ in range(size)]
-            if self.tab_[:size//2] is not None:
-                for i in range(len(self.tab_[:size//2])):
-                    tabl[i] = self.tab_[:size//2][i]
+        if len(self.tab_) > capacity:
+            elems: element = element(next=self.next_, datalist= self.tab_[capacity//2:])
+            tabl: list= [None for _ in range(capacity)]
+            if self.tab_[:capacity//2] is not None:
+                for i in range(len(self.tab_[:capacity//2])):
+                    tabl[i] = self.tab_[:capacity//2][i]
             self.tab_ = tabl
             self.next_ = elems
-
-            
 
     def delete(self, index: int):
         pass
@@ -82,16 +86,50 @@ class element:
         print(self)
 
 
+class unrolledlinkedlist():
+    def __init__(self, head:element = None) -> None:
+        if head is None:
+            self.head_ = element()
+        else: self.head_ = head
+
+    def get(self, index: int):
+        if self.head_ is not None:
+            return self.head_.get(index)
+        else:
+            return None
+
+    def insert(self, data, index: int):
+        if self.head_ is not None:
+            self.head_.insert(data =data, index = index)
+
+    def delete(self, index: int):
+        if self.head_ is not None:
+            self.head_.delete(index)
+
+    def __str__(self) -> str:
+        if self.head_ is not None:
+            return self.head_.__str__()
+        else:
+            return "[]"
+    
+    def debug(self):
+        if self.head_ is not None:
+            return self.head_.debug()
+        else:
+            return "[]"
+
+
+    
 
 if __name__ == "__main__":
-    size = 6
-    elem = element()
+    capacity = 6
+    elem = unrolledlinkedlist()
     elem.debug()
     print("Inserting")
     for i in range(0,10):
         elem.insert(data = i, index = i)
         elem.debug()
-    print("Getting: " + str(elem.get(4)))
+    print("Getting [4]: " + str(elem.get(4)))
     elem.insert(10,1)
     elem.insert(11,8)
     print("Random insert")
