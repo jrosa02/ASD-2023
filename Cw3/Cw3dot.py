@@ -96,11 +96,11 @@ class element:
             prev = elem
             elem = elem.next_
         if elem is not None:
-            elem.tab_ = elem.nononetab()[:index] + elem.nononetab()[1+index:] + [None for _ in range(capacity + 1 - len(elem))]
+            elem.tab_ = elem.nononetab()[:index] + elem.nononetab()[index+1:] + [None for _ in range(capacity + 1 - len(elem))]
 
         if len(elem) < capacity//2:
-            elem.insert(elem.next_.get(0), capacity//2 - 1)
-            elem.next_.delete(0)
+            elem.tab_[int(capacity//2)-1] = elem.next_.get(0)
+            elem.next_.tab_ = elem.next_.tab_[1:] + [None]
             if len(elem.next_) < capacity//2:
                 elem.tab_ = elem.nononetab() + elem.next_.nononetab() + [None for _ in range(capacity - len(elem) - len(elem.next_))]
                 elem.next_ = elem.next_.next_
@@ -160,10 +160,9 @@ class unrolledlinkedlist():
 if __name__ == "__main__":
     capacity = 6
     elem = unrolledlinkedlist()
-    elem.debug()
     print("Inserting")
-    for i in range(0,10):
-        elem.insert(data = i, index = i)
+    for i in range(1,10):
+        elem.insert(data = i, index = i+1)
         elem.debug()
     print("Getting [4]: " + str(elem.get(4)))
     print("Random insert (10,1),(11,8)")
