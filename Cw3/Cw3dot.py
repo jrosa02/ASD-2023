@@ -3,16 +3,19 @@ capacity = 0
 
 class element:
     def __init__(self, next = None, datalist: list = None) -> None:
-        print("Eleme init")
+        #print("Eleme init")
         self.tab_: list= [None for _ in range(capacity)]
         if datalist is not None:
             for i in range(len(datalist)):
                 self.tab_[i] = datalist[i]
         self.next_: element = next
-        print(self.tab_)
+        #print(self.tab_)
+
+    def nononetab(self):
+        return [i for i in self.tab_ if i is not None]
 
     def __len__(self):
-        return len([i for i in self.tab_ if i is not None])
+        return len(self.nononetab())
             
     def get(self, index: int):
         elem = self
@@ -23,7 +26,7 @@ class element:
             return elem.tab_[index]
         
     def append_forNone(self, data):
-        print("append")
+        #print("append")
         i =0 
         if self.tab_[0] is not None:
             while self.tab_[i] is not None:
@@ -31,15 +34,15 @@ class element:
         self.tab_[i] = data
 
     def insert2tab(self, data, index):
-        print("index < cap")
+        #print("index < cap")
         if self.tab_[index] is None:
             self.tab_[index] = data
-            print("zastap None")
+            #print("zastap None")
         else:
             self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
-            print("wstaw i rozson")
+            #print("wstaw i rozson")
             if self.tab_[-1] is None:
-                print("usun None")
+                #print("usun None")
                 self.tab_.pop()
 
     def delete_overflow(self):
@@ -64,66 +67,44 @@ class element:
         połowa zapełnionej tablicy jest przenoszona do nowego elementu i wstawienie danej 
         zachodzi albo w opróżnianym elemencie albo we wstawianym (w zależności gdzie 'wypada' miejsce wskazane przez indeks). 
         Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
-        print("Inserting")
+        #print("Inserting")
         if index < len(self):
-            print("index < capacity and index < len(self)")
+            #print("index < capacity and index < len(self)")
             self.insert2tab(data, index)
-        elif self.tab_[-1] is None and self.next_ is None and index < capacity:
-            print("Append")
+        elif self.tab_[-1] is None and self.next_ is None:
+            #print("Append")
             self.append_forNone(data)
         elif index > len(self):
             if self.next_ is None:
+                #print("Simple append")
                 self.tab_.append(data)
             else:
                 self.next_.insert(data, index-len(self))
 
-
-        
-
-
-        
-            
         self.delete_overflow()
 
-    def insert_old(self, data, index: int):
-        """wstawiająca daną w miejscu wskazanym przez podany indeks, przesuwając istniejące elementy w prawo;
-        jeżeli tablica elementu w którym ma nastąpić wstawienie jest pełna to do listy dokładany jest nowy element, 
-        połowa zapełnionej tablicy jest przenoszona do nowego elementu i wstawienie danej 
-        zachodzi albo w opróżnianym elemencie albo we wstawianym (w zależności gdzie 'wypada' miejsce wskazane przez indeks). 
-        Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
-
-        print("Inserting")
-        if index < capacity:
-            print("index < cap")
-            if self.tab_[index] is None:
-                self.tab_[index] = data
-                print("zastap None")
-            else:
-                self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
-                print("wstaw i rozson")
-                if self.tab_[-1] is None:
-                    print("usun None")
-                    self.tab_.pop()
-        elif self.tab_[-1] is None and self.next_ is None:
-                print("append")
-                i =0 
-                if self.tab_[0] is not None:
-                    while self.tab_[i] is not None:
-                        i+=1
-                self.tab_[i] = data
-        if index >= capacity:
-            print("To next elem")
-            if self.next_ is None:
-                print("nowy element")
-                lst = [data]
-                self.next_ = element(next= None, datalist=[data])
-            elif self.next_ is not None:
-                self.next_.insert(data, index-len(self.tab_))
-
-        self.delete_overflow()
 
     def delete(self, index: int):
-        pass
+        """ usuwająca  daną spod podanego indeksu 
+        - dodatkowo jeżeli tablica jest zapełniona mniej niż w połowie z następnego elementu listy jest do niej przenoszony pierwszy element tablicy;
+          jeżeli to przeniesienie spowoduje, że zapełnienie tablicy w tym następnym elemencie spadnie poniżej połowy wtedy wszystkie je elementy są przenoszone 
+          do tablicy we wcześniejszym elemencie listy (tej, z której usuwana była dana),
+          a element listy z pustą już tablicą jest usuwany."""
+        elem: element = self
+        while index >= len(elem) and elem.next_ is not None:
+            index -= len(elem)
+            prev = elem
+            elem = elem.next_
+        if elem is not None:
+            elem.tab_ = elem.nononetab()[:index] + elem.nononetab()[index+1:] + [None for _ in range(capacity + 1 - len(elem))]
+
+        if len(elem) < capacity//2:
+            elem.tab_[int(capacity//2)-1] = elem.next_.get(0)
+            elem.next_.tab_ = elem.next_.tab_[1:] + [None]
+            if len(elem.next_) < capacity//2:
+                elem.tab_ = elem.nononetab() + elem.next_.nononetab() + [None for _ in range(capacity - len(elem) - len(elem.next_))]
+                elem.next_ = elem.next_.next_
+
 
     def __str__(self):
         out = "-----------------------------------\n"
@@ -135,6 +116,7 @@ class element:
         out += ("-----------------------------------")
         return out
 
+
     def debug(self):
         print(self)
 
@@ -143,7 +125,8 @@ class unrolledlinkedlist():
     def __init__(self, head:element = None) -> None:
         if head is None:
             self.head_ = element()
-        else: self.head_ = head
+        else: 
+            self.head_ = head
 
     def get(self, index: int):
         if self.head_ is not None:
@@ -177,10 +160,9 @@ class unrolledlinkedlist():
 if __name__ == "__main__":
     capacity = 6
     elem = unrolledlinkedlist()
-    elem.debug()
     print("Inserting")
-    for i in range(0,10):
-        elem.insert(data = i, index = i)
+    for i in range(1,10):
+        elem.insert(data = i, index = i+1)
         elem.debug()
     print("Getting [4]: " + str(elem.get(4)))
     print("Random insert (10,1),(11,8)")
@@ -188,7 +170,8 @@ if __name__ == "__main__":
     elem.insert(11,8)
 
     elem.debug()
-    elem.delete(1)
-    elem.delete(2)
     print("Deleting")
+    elem.delete(1)
+    elem.debug()
+    elem.delete(2)
     elem.debug()
