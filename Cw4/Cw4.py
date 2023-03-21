@@ -12,11 +12,12 @@ class Elem:
 class Hashmap:
     def __init__(self, size: int, c1: int = 1, c2: int = 0) -> None:
         self.tab_ :list[Elem] = [None for _ in range(size)]
+        self.size_ = size
         self.c1_ = c1
         self.c2_  = c2
         
     def __len__(self) -> int:
-        return len(self.tab_)
+        return self.size_
 
     def hash(self, key) -> int:
         if isinstance(key, str):
@@ -27,15 +28,31 @@ class Hashmap:
         elif isinstance(key, int):
             #print("hash ->" + str(len(self)))
             return key % len(self)
+        
+    def solve_collision(self, key) -> int:
+        default_index = self.hash(key) + 1
+        i = 0
+        while True:
+            new_index = (default_index + self.c1_*i + self.c2_ * i**2) % len(self)
+            if new_index == default_index:
+                return None
+            if self.tab_[new_index] is None or self.tab_[new_index].key_ == key:
+                return new_index
+            
+
+            i += 1
+            if i >= len(self):
+                i = 0 
 
     def search(self, key):
         default_index = self.hash(key)
-        if self.tab_[default_index].key_ == key:
+        if self.tab_[default_index] is not None and self.tab_[default_index].key_ == key:
+            #print("default search")
             return self.tab_[default_index].value_
         else:
             if self.c1_ == 1 and self.c2_ == 0:
                 i = default_index + 1
-                while self.tab_[i].key_ != key:
+                while True:
                     if i == default_index:
                         return None
                     
@@ -68,17 +85,34 @@ class Hashmap:
                         i = 0
                 return None
 
-    def remove(self):
-        pass
+    def remove(self, key):
+        default_index = self.hash(key)
+        if self.tab_[default_index] is None or self.tab_[default_index].key_ == key:
+            self.tab_[default_index] = None
+            return True
+        else:
+            if self.c1_ == 1 and self.c2_ == 0:
+                i = default_index + 1
+                while True:
+                    if i == default_index:
+                        return None
+                    if self.tab_[i] is None or self.tab_[i].key_ == key:
+                        self.tab_[i] = None
+                        return True
+                    
+                    i += 1
+                    if i >= len(self):
+                        i = 0
+                return None
 
     def __str__(self):
-        outstr: str = ""
+        outstr: str = "--Hashmap--\n"
         for elem in self.tab_:
             if elem is None:
                 outstr += "(None)\n"
             else:
                 outstr += str(elem)
-        return outstr
+        return outstr + "----------" 
 
 
 
@@ -93,4 +127,13 @@ if __name__ =="__main__":
     print(mapa.search(14))
     mapa.insert(Elem(5, "Z"))
     print(mapa.search(5))
-    #mapa.remove()
+    mapa.remove(5)
+    print(mapa)
+    print(mapa.search(31))
+    mapa.insert(Elem('test', "W"))
+    print(mapa)
+
+    mapa2 = Hashmap(13)
+    for i in range(1,14):
+        mapa2.insert(Elem(13*i, values[i-1]))
+    print(mapa2)
