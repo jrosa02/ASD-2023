@@ -38,8 +38,6 @@ class Hashmap:
                 return None
             if self.tab_[new_index] is None or self.tab_[new_index].key_ == key:
                 return new_index
-            
-
             i += 1
             if i >= len(self):
                 i = 0 
@@ -50,19 +48,10 @@ class Hashmap:
             #print("default search")
             return self.tab_[default_index].value_
         else:
-            if self.c1_ == 1 and self.c2_ == 0:
-                i = default_index + 1
-                while True:
-                    if i == default_index:
-                        return None
-                    
-                    if self.tab_[i].key_ == key:
-                        return self.tab_[i].value_
-                    
-                    i += 1
-                    if i >= len(self):
-                        i = 0       
-                return None      
+            i = self.solve_collision(key)
+            if i is None: return None
+            else:
+                return self.tab_[i].value_    
 
     def insert(self, elem: Elem) -> bool:
         """wstawiająca daną wg podanego klucza, jeżeli element o takim kluczu istnieje, jego wartość powinna zostać nadpisana"""
