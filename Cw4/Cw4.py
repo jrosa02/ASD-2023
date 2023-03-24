@@ -30,8 +30,8 @@ class Hashmap:
             return key % len(self)
         
     def solve_collision(self, key) -> int:
-        default_index = self.hash(key) + 1
-        i = 0
+        default_index = self.hash(key)
+        i = 1
         while True:
             new_index = (default_index + self.c1_*i + self.c2_ * i**2) % len(self)
             if new_index == default_index:
@@ -39,8 +39,6 @@ class Hashmap:
             if self.tab_[new_index] is None or self.tab_[new_index].key_ == key:
                 return new_index
             i += 1
-            if i >= len(self):
-                i = 0 
 
     def search(self, key):
         default_index = self.hash(key)
@@ -60,19 +58,10 @@ class Hashmap:
             self.tab_[default_index] = elem
             return True
         else:
-            if self.c1_ == 1 and self.c2_ == 0:
-                i = default_index + 1
-                while True:
-                    if i == default_index:
-                        return None
-                    if self.tab_[i] is None or self.tab_[i].key_ == elem.key_:
-                        self.tab_[i] = elem
-                        return True
-                    
-                    i += 1
-                    if i >= len(self):
-                        i = 0
-                return None
+            i = self.solve_collision(elem.key_)
+            if i is None: return None
+            else:
+                self.tab_[i] = elem
 
     def remove(self, key):
         default_index = self.hash(key)
@@ -80,19 +69,10 @@ class Hashmap:
             self.tab_[default_index] = None
             return True
         else:
-            if self.c1_ == 1 and self.c2_ == 0:
-                i = default_index + 1
-                while True:
-                    if i == default_index:
-                        return None
-                    if self.tab_[i] is None or self.tab_[i].key_ == key:
-                        self.tab_[i] = None
-                        return True
-                    
-                    i += 1
-                    if i >= len(self):
-                        i = 0
-                return None
+            i = self.solve_collision(key)
+            if i is None: return None
+            else:
+                self.tab_[i] = None
 
     def __str__(self):
         outstr: str = "--Hashmap--\n"
@@ -103,10 +83,16 @@ class Hashmap:
                 outstr += str(elem)
         return outstr + "----------" 
 
+def testM(mapa2: Hashmap):
+    keys = [1, 2, 3, 4, 5, 18, 31, 8, 9, 10, 11, 12, 13, 14, 15]
+    values = "ABCDEFGHIJKLMNOPRSTUWXYZ"
+    print("Druga funkcja testująca")
+    for i in range(1,14):
+        mapa2.insert(Elem(13*i, values[i-1]))
+    print(mapa2)
 
-
-if __name__ =="__main__":
-    mapa = Hashmap(size = 13)
+def testm1(mapa:Hashmap):
+    print("Pierwsza funkcja testująca")
     keys = [1, 2, 3, 4, 5, 18, 31, 8, 9, 10, 11, 12, 13, 14, 15]
     values = "ABCDEFGHIJKLMNOPRSTUWXYZ"
     for i in range(len(keys)):
@@ -122,7 +108,12 @@ if __name__ =="__main__":
     mapa.insert(Elem('test', "W"))
     print(mapa)
 
+if __name__ =="__main__":
+    mapa = Hashmap(13)
+    testm1(mapa)
     mapa2 = Hashmap(13)
-    for i in range(1,14):
-        mapa2.insert(Elem(13*i, values[i-1]))
-    print(mapa2)
+    testM(mapa2)
+    print("kwadratowe")
+    mapa3 = Hashmap(13, 0, 1)
+    testm1(mapa3)
+    testM(mapa3)
