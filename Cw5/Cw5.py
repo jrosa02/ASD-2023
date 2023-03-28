@@ -58,7 +58,24 @@ class Node:
 
 
     def height(self) -> int:
-        pass
+        llvl = 1
+        rlvl = 1
+        if self.right_desc_ is not None:
+            rlvl = self.right_desc_.height() + 1
+        if self.left_desc_ is not None:
+            llvl = self.left_desc_.height() + 1
+        
+        return max(rlvl, llvl)
+    
+    def tolist(self, lst:list):
+        if self is not None:
+            if self.right_desc_ is not None:
+                self.right_desc_.tolist(lst)
+            lst.append((self.key_, self.value_))
+            if self.left_desc_ is not None:
+                self.left_desc_.tolist(lst)
+
+        
 
 class BST:
     def __init__(self, root: Node = None) -> None:
@@ -80,8 +97,13 @@ class BST:
         node, prev = self.root_.search(key, self.root_)
         node.delete(prev)
 
-    def height(self):
-        pass
+    def height(self) -> int:
+        return self.root_.height()
+    
+    def print(self) -> str:
+        lst = []
+        self.root_.tolist(lst)
+        print(lst)
 
     def print_tree(self):
         print("==============")
@@ -99,11 +121,32 @@ class BST:
 
 
 if __name__ == "__main__":
-    keyvalue = {50:'A', 15:'B', 62:'C', 5:'D', 20:'E', 58:'F', 91:'G', 3:'H', 8:'I', 37:'J', 60:'K', 24:'L'}
+    # utworzenie pustego drzewa BST
     tree = BST()
+    # dodanie kolejno elementy klucz:wartość -- {50:'A', 15:'B', 62:'C', 5:'D', 20:'E', 58:'F', 91:'G', 3:'H', 8:'I', 37:'J', 60:'K', 24:'L'}, tworząc drzewo o podanej strukturze, jak na rysunku: 
+    keyvalue = {50:'A', 15:'B', 62:'C', 5:'D', 20:'E', 58:'F', 91:'G', 3:'H', 8:'I', 37:'J', 60:'K', 24:'L'}
     for key in keyvalue:
         tree.insert(key, keyvalue[key])
+    # wypis drzewo 2D (funkcją print_tree)
     tree.print_tree()
-    print(tree.search(60))
-    tree.delete(37)
-    tree.print_tree()
+    # wyświetl zawartość drzewa jako listę elementów ułożonych od najmniejszego do największego klucza wypisanych w postaci klucz wartość - przykładowo powyższe drzewo powinno być wypisane tak:
+    # 3 H,5 D,8 I,15 B,20 E,24 L,37 J,50 A,58 F,60 K,62 C,91 G,
+    tree.print()
+    # # znajdź klucz 24 i wypisz wartość
+    print(tree.search(24))
+    # zaktualizuj wartość "AA" dla klucza 20
+    tree.insert(20, "AA")
+    # dodaj element 6:M
+    tree.insert(6, "M")
+    # usuń element o kluczu 62
+    # dodaj element 59:N
+    # dodaj element 100:P
+    # usuń element o kluczu 8
+    # usuń element o kluczu 15
+    # wstaw element 55:R
+    # usuń element o kluczu 50
+    # usuń element o kluczu 5
+    # usuń element o kluczu 24
+    # wypisz wysokość drzewa
+    # wyświetl zawartość drzewa jako listę od najmniejszego do największego klucza w formie klucz:wartość
+    # wyświetl drzewo 2D
