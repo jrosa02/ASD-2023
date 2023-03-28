@@ -36,6 +36,19 @@ class Node:
             else:
                 self.right_desc_ = Node(key, value)
 
+    def find_leftest(self, prev = None):
+        if self.left_desc_ is None:
+            return self, prev
+        else:
+            return self.left_desc_.find_leftest(self)
+        
+    def find_rightest(self, prev = None):
+        if self.right_desc_ is None:
+            return self, prev
+        else:
+            return self.right_desc_.find_rightest(self)
+
+
     def delete(self, prev):
         prev: Node = prev
         if self.left_desc_ is None and self.right_desc_ is None:
@@ -43,19 +56,21 @@ class Node:
                 prev.left_desc_ = None
             else:
                 prev.right_desc_ = None
-        elif self.left_desc_ is not None:
+        elif self.left_desc_ is not None and self.right_desc_ is None:
             if prev.key_ < self.key_:
                 prev.left_desc_ = self.left_desc_
             else:
                 prev.right_desc_ = self.left_desc_
-        elif self.right_desc_ is not None:
+        elif self.left_desc_ is None and self.right_desc_ is not None:
             if prev.key_ < self.key_:
                 prev.left_desc_ = self.right_desc_
             else:
                 prev.right_desc_ = self.right_desc_
         else:
-            pass
-
+            if prev.key_ < self.key_:
+                pass
+            else:
+                pass
 
     def height(self) -> int:
         llvl = 1
@@ -83,7 +98,11 @@ class BST:
 
     def search(self, key):
         if self.root_ is not None:
-            return self.root_.search(key, self.root_)[0].value_
+            x = self.root_.search(key, self.root_)
+            if x == None:
+                print("Not found: " + str(key))
+                return None
+            return x[0].value_
         else: 
             return None
         
@@ -94,7 +113,11 @@ class BST:
             self.root_ = Node(key, value)
 
     def delete(self, key):
-        node, prev = self.root_.search(key, self.root_)
+        x = self.root_.search(key, self.root_)
+        if x == None:
+            print("Not found: " + str(key))
+            return None
+        node, prev = x
         node.delete(prev)
 
     def height(self) -> int:
@@ -128,10 +151,10 @@ if __name__ == "__main__":
     for key in keyvalue:
         tree.insert(key, keyvalue[key])
     # wypis drzewo 2D (funkcją print_tree)
-    tree.print_tree()
+    #tree.print_tree()
     # wyświetl zawartość drzewa jako listę elementów ułożonych od najmniejszego do największego klucza wypisanych w postaci klucz wartość - przykładowo powyższe drzewo powinno być wypisane tak:
     # 3 H,5 D,8 I,15 B,20 E,24 L,37 J,50 A,58 F,60 K,62 C,91 G,
-    tree.print()
+    #tree.print()
     # # znajdź klucz 24 i wypisz wartość
     print(tree.search(24))
     # zaktualizuj wartość "AA" dla klucza 20
@@ -139,14 +162,29 @@ if __name__ == "__main__":
     # dodaj element 6:M
     tree.insert(6, "M")
     # usuń element o kluczu 62
+    tree.print_tree()
+    tree.delete(62)
+    tree.print_tree()
     # dodaj element 59:N
+    tree.insert(59, "N")
     # dodaj element 100:P
+    tree.insert(100, "P")
     # usuń element o kluczu 8
+    tree.delete(8)
     # usuń element o kluczu 15
+    tree.delete(15)
     # wstaw element 55:R
+    tree.insert(55, "r")
     # usuń element o kluczu 50
+    tree.delete(50)
     # usuń element o kluczu 5
+    tree.print_tree()
+    tree.delete(5)
     # usuń element o kluczu 24
+    tree.delete(24)
     # wypisz wysokość drzewa
+    print(tree.height())
     # wyświetl zawartość drzewa jako listę od najmniejszego do największego klucza w formie klucz:wartość
-    # wyświetl drzewo 2D
+    tree.print()
+    # wyświetl drzewo 2D\
+    tree.print_tree()
