@@ -38,18 +38,21 @@ class Node:
 
     def find_leftest(self, prev = None):
         if self.left_desc_ is None:
+            prev: Node = prev
             return self, prev
         else:
-            return self.left_desc_.find_leftest(self)
+            return self.left_desc_.find_leftest(prev = self)
         
     def find_rightest(self, prev = None):
         if self.right_desc_ is None:
+            prev: Node = prev
             return self, prev
         else:
-            return self.right_desc_.find_rightest(self)
+            return self.right_desc_.find_rightest(prev = self)
 
 
     def delete(self, prev):
+        #print(self)
         prev: Node = prev
         if self.left_desc_ is None and self.right_desc_ is None:
             if prev.key_ < self.key_:
@@ -68,9 +71,26 @@ class Node:
                 prev.right_desc_ = self.right_desc_
         else:
             if prev.key_ < self.key_:
-                pass
+                node2ins, prevnode2ins = self.right_desc_.find_leftest(self)
+                prevnode2ins.left_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
+                node2append, prevnode2append = node2ins.find_rightest(node2ins)   #znalezienie najmniejszego potomka obiektu do podstawienia
+                node2append.right_desc_ = self.right_desc_       
+                node2ins.left_desc_ = self.left_desc_       #podpięcie wszystkich lewych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
+                prev.left_desc_ = node2ins
             else:
-                pass
+                # 24-37-20-24-
+                selfrightdesc = self.right_desc_
+                node2ins, prevnode2ins = self.left_desc_.find_rightest(self)
+                prevnode2ins.right_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
+                node2append, prevnode2append = node2ins.find_leftest(node2ins)   #znalezienie najmniejszego potomka obiektu do podstawienia
+                if prevnode2append !=node2ins:
+                    node2append.left_desc_ = self.left_desc_       
+                node2ins.right_desc_ = selfrightdesc       #podpięcie wszystkich prawych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
+                prev.right_desc_ = node2ins
+
+
+            
+                
 
     def height(self) -> int:
         llvl = 1
@@ -89,6 +109,9 @@ class Node:
             lst.append((self.key_, self.value_))
             if self.left_desc_ is not None:
                 self.left_desc_.tolist(lst)
+
+    def __str__(self):
+        return str(self.key_) + " : " + str(self.value_)
 
         
 
@@ -118,7 +141,14 @@ class BST:
             print("Not found: " + str(key))
             return None
         node, prev = x
-        node.delete(prev)
+        if key == self.root_.key_:
+            node2ins, prevnode2ins = self.root_.left_desc_.find_rightest(self.root_)
+            prevnode2ins.right_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
+            node2ins.right_desc_ = self.root_.right_desc_
+            node2ins.left_desc_ = self.root_.left_desc_
+            self.root_ = node2ins
+        else:
+            node.delete(prev)
 
     def height(self) -> int:
         return self.root_.height()
@@ -151,10 +181,10 @@ if __name__ == "__main__":
     for key in keyvalue:
         tree.insert(key, keyvalue[key])
     # wypis drzewo 2D (funkcją print_tree)
-    #tree.print_tree()
+    tree.print_tree()
     # wyświetl zawartość drzewa jako listę elementów ułożonych od najmniejszego do największego klucza wypisanych w postaci klucz wartość - przykładowo powyższe drzewo powinno być wypisane tak:
     # 3 H,5 D,8 I,15 B,20 E,24 L,37 J,50 A,58 F,60 K,62 C,91 G,
-    #tree.print()
+    tree.print()
     # # znajdź klucz 24 i wypisz wartość
     print(tree.search(24))
     # zaktualizuj wartość "AA" dla klucza 20
@@ -162,9 +192,7 @@ if __name__ == "__main__":
     # dodaj element 6:M
     tree.insert(6, "M")
     # usuń element o kluczu 62
-    tree.print_tree()
     tree.delete(62)
-    tree.print_tree()
     # dodaj element 59:N
     tree.insert(59, "N")
     # dodaj element 100:P
@@ -173,12 +201,12 @@ if __name__ == "__main__":
     tree.delete(8)
     # usuń element o kluczu 15
     tree.delete(15)
+    # 24-37-20-24-
     # wstaw element 55:R
     tree.insert(55, "r")
     # usuń element o kluczu 50
     tree.delete(50)
-    # usuń element o kluczu 5
-    tree.print_tree()
+    # # usuń element o kluczu 5
     tree.delete(5)
     # usuń element o kluczu 24
     tree.delete(24)
