@@ -71,11 +71,15 @@ class Node:
                 prev.right_desc_ = self.right_desc_
         else:
             if prev.key_ < self.key_:
+                selfleftdesc = self.left_desc_
                 node2ins, prevnode2ins = self.right_desc_.find_leftest(self)
                 prevnode2ins.left_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
                 node2append, prevnode2append = node2ins.find_rightest(node2ins)   #znalezienie najmniejszego potomka obiektu do podstawienia
-                node2append.right_desc_ = self.right_desc_       
-                node2ins.left_desc_ = self.left_desc_       #podpięcie wszystkich lewych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
+                if prevnode2append !=node2ins:
+                    node2append.right_desc_ = self.right_desc_
+                else:
+                           
+                node2ins.left_desc_ = selfleftdesc       #podpięcie wszystkich prawych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
                 prev.left_desc_ = node2ins
             else:
                 # 24-37-20-24-
@@ -99,7 +103,6 @@ class Node:
             rlvl = self.right_desc_.height() + 1
         if self.left_desc_ is not None:
             llvl = self.left_desc_.height() + 1
-        
         return max(rlvl, llvl)
     
     def tolist(self, lst:list):
@@ -192,7 +195,9 @@ if __name__ == "__main__":
     # dodaj element 6:M
     tree.insert(6, "M")
     # usuń element o kluczu 62
+    tree.print_tree()
     tree.delete(62)
+    tree.print_tree()
     # dodaj element 59:N
     tree.insert(59, "N")
     # dodaj element 100:P
@@ -201,12 +206,12 @@ if __name__ == "__main__":
     tree.delete(8)
     # usuń element o kluczu 15
     tree.delete(15)
-    # 24-37-20-24-
+    #24-37-20-24-
     # wstaw element 55:R
     tree.insert(55, "r")
     # usuń element o kluczu 50
     tree.delete(50)
-    # # usuń element o kluczu 5
+    # usuń element o kluczu 5
     tree.delete(5)
     # usuń element o kluczu 24
     tree.delete(24)
