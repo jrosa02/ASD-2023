@@ -71,26 +71,16 @@ class Node:
                 prev.right_desc_ = self.right_desc_
         else:
             if prev.key_ < self.key_:
-                selfleftdesc = self.left_desc_
                 node2ins, prevnode2ins = self.right_desc_.find_leftest(self)
-                prevnode2ins.left_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
-                node2append, prevnode2append = node2ins.find_rightest(node2ins)   #znalezienie najmniejszego potomka obiektu do podstawienia
-                if prevnode2append !=node2ins:
-                    node2append.right_desc_ = self.right_desc_
-                else:
-                           
-                node2ins.left_desc_ = selfleftdesc       #podpięcie wszystkich prawych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
-                prev.left_desc_ = node2ins
+                self.key_ = node2ins.key_
+                self.value_ = node2ins.value_
+                node2ins.delete(prevnode2ins)
+                
             else:
-                # 24-37-20-24-
-                selfrightdesc = self.right_desc_
                 node2ins, prevnode2ins = self.left_desc_.find_rightest(self)
-                prevnode2ins.right_desc_ = None      #usuwanie obiektu do podstawienia ze starej pozycji
-                node2append, prevnode2append = node2ins.find_leftest(node2ins)   #znalezienie najmniejszego potomka obiektu do podstawienia
-                if prevnode2append !=node2ins:
-                    node2append.left_desc_ = self.left_desc_       
-                node2ins.right_desc_ = selfrightdesc       #podpięcie wszystkich prawych potomków do obiektu dpodst który nie może mieć swoich lewych bo jest najbardziej lewy
-                prev.right_desc_ = node2ins
+                self.key_ = node2ins.key_
+                self.value_ = node2ins.value_
+                node2ins.delete(prevnode2ins)
 
 
             
