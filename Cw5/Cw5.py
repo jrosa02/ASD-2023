@@ -159,12 +159,12 @@ class BST:
 
     def __print_tree(self, node: Node, lvl: int):
         if node!=None:
-            self.__print_tree(node.right_desc_, lvl+5)
+            self.__print_tree(node.left_desc_, lvl+5)
 
             #print()
             print(lvl*" ", node.key_, node.value_)
      
-            self.__print_tree(node.left_desc_, lvl+5)
+            self.__print_tree(node.right_desc_, lvl+5)
 
 
 if __name__ == "__main__":
