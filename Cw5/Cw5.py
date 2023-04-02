@@ -51,8 +51,7 @@ class Node:
             return self.right_desc_.find_rightest(prev = self)
 
 
-    def delete(self, prev):
-        #print(self)
+    def delete(self, prev) -> None:
         prev: Node = prev
         if self.left_desc_ is None and self.right_desc_ is None:
             if prev.key_ < self.key_:
@@ -70,17 +69,19 @@ class Node:
             else:
                 prev.right_desc_ = self.right_desc_
         else:
-            if prev.key_ < self.key_:
-                node2ins, prevnode2ins = self.right_desc_.find_leftest(self)
-                self.key_ = node2ins.key_
-                self.value_ = node2ins.value_
-                node2ins.delete(prevnode2ins)
-                
-            else:
-                node2ins, prevnode2ins = self.left_desc_.find_rightest(self)
-                self.key_ = node2ins.key_
-                self.value_ = node2ins.value_
-                node2ins.delete(prevnode2ins)
+            lft_rightest, lft_right_prev = self.left_desc_.find_rightest(self.left_desc_)
+            self.key_ = lft_rightest.key_
+            self.value_ = lft_rightest.value_
+            branch2append = lft_rightest.left_desc_
+            if lft_rightest.left_desc_ is not None:
+                end_branch2append = branch2append.find_leftest()[0]
+            self.left_desc_ = branch2append
+            if lft_rightest.left_desc_ is not None and end_branch2append != self.left_desc_:
+                end_branch2append.left_desc_ = self.left_desc_
+
+
+
+            
 
 
             
@@ -160,7 +161,7 @@ class BST:
         if node!=None:
             self.__print_tree(node.right_desc_, lvl+5)
 
-            print()
+            #print()
             print(lvl*" ", node.key_, node.value_)
      
             self.__print_tree(node.left_desc_, lvl+5)
@@ -185,9 +186,7 @@ if __name__ == "__main__":
     # dodaj element 6:M
     tree.insert(6, "M")
     # usuń element o kluczu 62
-    tree.print_tree()
     tree.delete(62)
-    tree.print_tree()
     # dodaj element 59:N
     tree.insert(59, "N")
     # dodaj element 100:P
