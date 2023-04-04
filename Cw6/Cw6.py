@@ -9,9 +9,13 @@ class Node:
         self.__priorytet = priorytet
     
     def __gt__(self, other):
+        if other == None:
+           return True
         return self.__priorytet > other.__priorytet
     
     def __lt__(self, other):
+        if other == None:
+            return False
         return self.__priorytet < other.__priorytet
 
     def __str__(self) -> str:
@@ -23,8 +27,8 @@ class Kopiec:
     # konstruktor tworzący pustą kolejkę
     def __init__(self) -> None:
         self.tab = []
-        self.size = 0
-        self.heap_size = 0
+        self.tree_size = 0
+        self.tab_size = 0
     
     # is_empty - zwracająca True jeżeli kolejka jest pusta
     def is_empty(self):
@@ -58,36 +62,45 @@ class Kopiec:
             return None
         else:
             return self.tab[0]
+        
+    def is_smaller(self, a, b):
+        if a is None and b is None:
+            return False
+        elif a is None:
+            return False
+        elif b is None:
+            return True
+        else:
+            return a > b
+
+    
+
+    def _dequeue(self, index):
+        left_child_i = self.left(index)
+        right_child_i = self.right(index)
+        if self.is_smaller(left_child_i, right_child_i):
+            child_i = left_child_i
+        else:
+            child_i = right_child_i
+        if child_i > self.tab_size:
+            return None
+        self.tab[child_i], self.tab[index] = self.tab[index], self.tab[child_i]
+        print(child_i)
+        self._dequeue(child_i)
+        return None
+    
+
     # dequeue - zwracająca None jeżeli kolejka jest pusta lub element kolejki o najwyższym priorytecie 
     # (zdejmując go z wierzchołka kopca)
     def dequeue(self):
         if self.is_empty():
             return None
-        elem2ret = self.tab[0]
+        ret_value = self.peek()
         self.tab[0] = None
-        parent_index = 0
-        left_child_idx = self.left(parent_index)
-        right_child_idx = self.right(parent_index)
-        if self.tab[left_child_idx] > self.tab[right_child_idx]:
-            child_idx = left_child_idx
-        else:
-            child_idx = right_child_idx
-        while child_idx < self.heap_size:
-            self.tab[parent_index], self.tab[child_idx] = self.tab[child_idx], self.tab[parent_index]
-            parent_index = child_idx
-            left_child_idx = self.left(parent_index)
-            right_child_idx = self.right(parent_index)
-            if left_child_idx < self.size and right_child_idx < self.size and self.tab[left_child_idx] > self.tab[right_child_idx]:
-                child_idx = left_child_idx
-            else:
-                child_idx = right_child_idx
-        
-        self.heap_size -= 1
-        return elem2ret
-        
-            
-
-
+        self._dequeue(0)
+        self.tree_size -= 1
+        return ret_value
+    
         
     # enqueue - otrzymująca dane do wstawienia do kolejki (kopca)  - tym razem będzie to cały obiekt klasy implementującej element kolejki.
     #  UWAGA - element początkowo jest dokładany na koniec KOPCA, więc:
@@ -95,13 +108,13 @@ class Kopiec:
     #   a jeżeli będzie mniejszy to będzie to oznaczało zastąpienie istniejącego elementu tablicy. 
     def enqueue(self, element2insert):
         self.tab.append(element2insert)
-        self.size += 1
-        self.heap_size += 1
-        parent_index = self.parent(self.size-1)
-        child_index = self.size-1
-        if self.size == 1:
+        self.tree_size += 1
+        self.tab_size += 1
+        parent_index = self.parent(self.tree_size-1)
+        child_index = self.tree_size-1
+        if self.tree_size == 1:
             return
-        while self.tab[parent_index] <= self.tab[child_index] and child_index != 0:
+        while (self.tab[parent_index] is None or self.tab[parent_index] <= self.tab[child_index]) and child_index != 0:
             self.tab[parent_index], self.tab[child_index] = self.tab[child_index], self.tab[parent_index]
             child_index = parent_index
             parent_index = self.parent(child_index)
@@ -110,16 +123,16 @@ class Kopiec:
 
     def print_tab(self):
         print ('{', end=' ')
-        print(*self.tab[:self.heap_size], sep=', ', end = ' ')
+        print(*self.tab[:self.tab_size], sep=', ', end = ' ')
         print( '}')
 
-    def print_tree(self, idx, lvl):
+    def print_tree(self, idx = 0, lvl = 0):
         print("==================")
         self._print_tree(idx, lvl)
         print("==================")
 
     def _print_tree(self, idx, lvl):
-        if idx<self.size:           
+        if idx<self.tree_size:           
             self._print_tree(self.right(idx), lvl+1)
             print(2*lvl*'  ', self.tab[idx] if self.tab[idx] else None)           
             self._print_tree(self.left(idx), lvl+1)
@@ -137,7 +150,9 @@ if __name__ == "__main__":
     # wypisanie aktualnego stanu kolejki w postaci tablicy
     kopiec.print_tab()
     # użycie dequeue do odczytu  pierwszej  danej z kolejki, proszę ją zapamiętać
+    kopiec.print_tree()
     elem = kopiec.dequeue()
+    kopiec.print_tree()
     # użycie  peek do odczytu i wypisania kolejnej  danej
     print(kopiec.peek())
     # wypisanie aktualnego stanu kolejki w postaci tablicy
@@ -145,6 +160,6 @@ if __name__ == "__main__":
     # wypisanie zapamiętanej, usuniętej pierwszej danej z kolejki
     print(elem)
     # opróżnienie kolejki z wypisaniem usuwanych danych (użycie dequeue w pętli dopóki w kolejce będą dane)
-    while not kopiec.is_empty():
-        print(kopiec.dequeue())
+    #while not kopiec.is_empty():
+    #    kopiec.dequeue()
     # wypisanie opróżnionej kolejki w postaci tablicy (powinno się wypisać { } )
