@@ -32,7 +32,7 @@ class Kopiec:
     
     # is_empty - zwracająca True jeżeli kolejka jest pusta
     def is_empty(self):
-        if len(self.tab) == 0:
+        if self.tree_size == 0:
             return True
         else:
             return False
@@ -62,33 +62,25 @@ class Kopiec:
             return None
         else:
             return self.tab[0]
-        
-    def is_smaller(self, a, b):
-        if a is None and b is None:
-            return False
-        elif a is None:
-            return False
-        elif b is None:
-            return True
-        else:
-            return a > b
 
     
 
-    def _dequeue(self, index):
-        left_child_i = self.left(index)
-        right_child_i = self.right(index)
-        if self.is_smaller(left_child_i, right_child_i):
-            child_i = left_child_i
-        else:
-            child_i = right_child_i
-        if child_i > self.tab_size:
-            return None
-        self.tab[child_i], self.tab[index] = self.tab[index], self.tab[child_i]
-        print(child_i)
-        self._dequeue(child_i)
-        return None
+    def _sort_down(self, index):
+        #self.print_tree()
+        if index < self.tree_size:
+            if self.left(index) < self.tree_size and self.tab[self.left(index)] > self.tab[self.right(index)]:
+                child_i = self.left(index) 
+                #print("Lefe bigger")
+            elif self.right(index) < self.tree_size:
+                child_i = self.right(index)
+                #print("right bigger")
+            else:
+                return None
+            if self.tab[index] <= self.tab[child_i]:
+                self.tab[index], self.tab[child_i] = self.tab[child_i], self.tab[index]
+            self._sort_down(child_i)
     
+        pass
 
     # dequeue - zwracająca None jeżeli kolejka jest pusta lub element kolejki o najwyższym priorytecie 
     # (zdejmując go z wierzchołka kopca)
@@ -96,9 +88,10 @@ class Kopiec:
         if self.is_empty():
             return None
         ret_value = self.peek()
-        self.tab[0] = None
-        self._dequeue(0)
+        self.tab[0] = self.tab[self.tree_size-1]
         self.tree_size -= 1
+        self._sort_down(0)
+        
         return ret_value
     
         
@@ -123,7 +116,7 @@ class Kopiec:
 
     def print_tab(self):
         print ('{', end=' ')
-        print(*self.tab[:self.tab_size], sep=', ', end = ' ')
+        print(*self.tab[:self.tree_size], sep=', ', end = ' ')
         print( '}')
 
     def print_tree(self, idx = 0, lvl = 0):
@@ -160,6 +153,7 @@ if __name__ == "__main__":
     # wypisanie zapamiętanej, usuniętej pierwszej danej z kolejki
     print(elem)
     # opróżnienie kolejki z wypisaniem usuwanych danych (użycie dequeue w pętli dopóki w kolejce będą dane)
-    #while not kopiec.is_empty():
-    #    kopiec.dequeue()
+    while not kopiec.is_empty():
+        print(kopiec.dequeue())
     # wypisanie opróżnionej kolejki w postaci tablicy (powinno się wypisać { } )
+    kopiec.print_tab()
