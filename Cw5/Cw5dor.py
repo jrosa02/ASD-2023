@@ -18,6 +18,17 @@ class Node:
         else:
             return None
         
+    def searchNbalance(self, key, prev, tree):
+        self.balance(prev, tree)
+        if self.key_ == key:
+            return self, prev
+        elif self.key_ < key and self.left_desc_ is not None:
+            return(self.left_desc_.search(key, self))
+        elif self.key_ > key and self.right_desc_ is not None:
+            return(self.right_desc_.search(key, self))
+        else:
+            return None
+        
     def imbalance(self):
         if self.left_desc_ is None:
             left_h = 0
@@ -39,24 +50,22 @@ class Node:
                 self.left_desc_.insert(key, value, self, tree)
             else:
                 self.left_desc_ = Node(key, value)
+                self.left_desc_.searchNbalance(key, self, tree)
         elif self.key_ > key:
             if self.right_desc_ is not None:
                 self.right_desc_.insert(key, value, self, tree)
             else:
                 self.right_desc_ = Node(key, value)
+                self.right_desc_.searchNbalance(key, self, tree)
         self.balance(prev, tree)
 
         #Balancing
     def balance(self, prev, tree = None):
         prev:Node = prev
         if self.imbalance() > 1:
-            #print("RR rot")
-            #self.print_subtree()
             self.RR(prev,  tree)
 
         if self.imbalance() < -1:
-            # print("LL rot")
-            #self.print_subtree()
             self.LL(prev, tree)
 
 
@@ -77,27 +86,30 @@ class Node:
 
 
     def delete(self, prev, tree):
-        print("self ", self)
-        print("prev ", prev)
-        prev :Node = prev
         if self.left_desc_ is None:
-            if prev.key_ > self.key_:
+            if prev.left_desc_ == self:
                 prev.left_desc_ = self.right_desc_
-            else:
+            elif prev.right_desc_ == self:
                 prev.right_desc_ = self.right_desc_
-        elif self.right_desc_ is None:
-            if prev.key_ > self.key_:
-                prev.left_desc_ = self.left_desc_
             else:
+                # self is root
+                self.key_ = self.right_desc_.key_
+                self.value_ = self.right_desc_.value_
+                self.left_desc_ = self.right_desc_.left_desc_
+                self.right_desc_ = self.right_desc_.right_desc_
+        elif self.right_desc_ is None:
+            if prev.left_desc_ == self:
+                prev.left_desc_ = self.left_desc_
+            elif prev.right_desc_ == self:
                 prev.right_desc_ = self.left_desc_
+            else:
+                print("AAAAA")
         else:
-            rightleftest, prevrleftest = self.right_desc_.find_leftest(self)
-            print()
-            self.key_ = rightleftest.key_
-            self.value_ = rightleftest.value_
-            rightleftest = None
-            print()
-
+            min_node, prev_min_node = self.right_desc_.find_leftest(self)
+            self.key_ = min_node.key_
+            self.value_ = min_node.value_
+            min_node.delete(prev_min_node, tree)   
+                
         
 
         
@@ -175,7 +187,7 @@ class BST:
         if self.root_ is not None:
             self.root_.insert(key, value, self.root_, self)
         else:
-            self.root_ = Node(key, value)
+            self.root_ = Node(key, value)\
 
     def delete(self, key):
         x = self.root_.search(key, self.root_)
@@ -192,6 +204,7 @@ class BST:
             self.root_.balance(self.root_, self)
         else:
             node.delete(prev, self)
+        self.root_.searchNbalance(node.key_, self.root_, self)
 
     def height(self) -> int:
         return self.root_.height()
@@ -226,6 +239,7 @@ if __name__ == "__main__":
     for key in słownik:
         dżewo.insert(key, słownik[key])
         #dżewo.print_tree()
+    
     # wyświetl drzewo 2D
     dżewo.print_tree()
     # wyświetl zawartość drzewa jako listę od najmniejszego do największego klucza w formie klucz:wartość
@@ -235,9 +249,7 @@ if __name__ == "__main__":
     # usuń element o kluczu 50
     dżewo.delete(50)
     # usuń element o kluczu 52
-    dżewo.print_tree()
     dżewo.delete(52)
-    dżewo.print_tree()
     # usuń element o kluczu 11
     dżewo.delete(11)
     # usuń element o kluczu 57
@@ -257,3 +269,4 @@ if __name__ == "__main__":
     # wyświetl drzewo 2D
     dżewo.print_tree()
     # wyświetl zawartość drzewa jako listę od najmniejszego do największego klucza w formie klucz:wartość
+    dżewo.print()
