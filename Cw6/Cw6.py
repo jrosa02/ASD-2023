@@ -76,7 +76,7 @@ class Kopiec:
                 #print("right bigger")
             else:
                 return None
-            if self.tab[index] <= self.tab[child_i]:
+            if self.tab[index] < self.tab[child_i]:
                 self.tab[index], self.tab[child_i] = self.tab[child_i], self.tab[index]
             self._sort_down(child_i)
     
@@ -107,7 +107,7 @@ class Kopiec:
         child_index = self.tree_size-1
         if self.tree_size == 1:
             return
-        while (self.tab[parent_index] is None or self.tab[parent_index] <= self.tab[child_index]) and child_index != 0:
+        while (self.tab[parent_index] is None or self.tab[parent_index] < self.tab[child_index]) and child_index != 0:
             self.tab[parent_index], self.tab[child_index] = self.tab[child_index], self.tab[parent_index]
             child_index = parent_index
             parent_index = self.parent(child_index)
@@ -136,8 +136,9 @@ if __name__ == "__main__":
     kopiec = Kopiec()
     # użycie w pętli enqueue do wpisana do niej elementów których priorytety będą brane z listy [7, 5, 1, 2, 5, 3, 4, 8, 9], a odpowiadające im wartości będą kolejnymi literami z napisu "GRYMOTYLA"
     priorytety = [7, 5, 1, 2, 5, 3, 4, 8, 9]
-    for priorytet in priorytety:
-        kopiec.enqueue(priorytet)
+    strink = "GRYMOTYLA"
+    for i in range(len(priorytety)):
+        kopiec.enqueue(Node(priorytety[i], strink[i]))
     # wypisanie aktualnego stanu kolejki w postaci kopca
     kopiec.print_tree(0, 0)
     # wypisanie aktualnego stanu kolejki w postaci tablicy
