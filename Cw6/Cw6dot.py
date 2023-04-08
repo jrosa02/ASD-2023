@@ -1,108 +1,104 @@
-class BTreeNode:
+class Node:
     def __init__(self, max_children):
-        self.keys = [None]*(max_children)
-        self.children = [None]*(max_children+1)
-        self.size = 0
+        self.tab_ = [None]*(max_children-1)
+        self.children: Node = [None]*(max_children)
+        self.max_children = max_children
+
+    def nononetab(self):
+        return [i for i in self.tab_ if i is not None]
+    def __len__(self):
+        return len(self.nononetab())
+
     
-    def is_full(self):
-        return self.size == len(self.children)-1
-    
-    def insert_in_node(self, key, child=None):
-        if self.is_full():
-            return self.split_node(key, child)
+    def append_forNone(self, data):
+        #print("append")
+        i =0 
+        if self.tab_[0] is not None:
+            while self.tab_[i] is not None:
+                i+=1
+        self.tab_[i] = data
+
+    def insert2tab(self, data, index):
+        #print("index < cap")
+        if self.tab_[index] is None:
+            self.tab_[index] = data
+            #print("zastap None")
+        else:
+            self.tab_ = self.tab_[:index] + [data] + self.tab_[index:]
+            #print("wstaw i rozson")
+            if self.tab_[-1] is None:
+                #print("usun None")
+                self.tab_.pop()
+
+    def delete_overflow(self):
+        #Przed dodaniem rozsuwania wszystko było o wiele bardziej
+        if len(self.tab_) > self.max_children:
+            self.divide()
+
+
+    def divide(self):
+        tabl: list= [None for _ in range(self.max_children)]
+        if self.tab_[:self.max_children//2] is not None:
+            for i in range(len(self.tab_[:self.max_children//2])):
+                tabl[i] = self.tab_[:self.max_children//2][i]
+        self.tab_ = tabl
         
-        i = self.size-1
-        while i>=0 and self.keys[i]>key:
-            self.keys[i+1] = self.keys[i]
-            self.children[i+2] = self.children[i+1]
-            i -= 1
-        
-        self.keys[i+1] = key
-        self.children[i+2] = child
-        self.size += 1
-    
-    def split_node(self, key, child=None):
-        mid = self.size//2
 
-        new_node = BTreeNode(len(self.children)-1)
-        new_node.keys = self.keys[mid+1:]
-        new_node.children = self.children[mid+1:]
-        new_node.size = self.size - mid - 1
-
-        self.keys = self.keys[:mid]
-        self.children = self.children[:mid+1]
-        self.size = mid
-        key_to_parent = self.keys[-1]
-
-        if child is not None:
-            if child.keys[0] < key_to_parent:
-                self.insert_in_node(child.keys[0], child.children[0])
-                new_node.children[0] = child.children[1]
+    def insert(self, data, index: int):
+        """wstawiająca daną w miejscu wskazanym przez podany indeks, przesuwając istniejące elementy w prawo;
+        jeżeli tablica elementu w którym ma nastąpić wstawienie jest pełna to do listy dokładany jest nowy element, 
+        połowa zapełnionej tablicy jest przenoszona do nowego elementu i wstawienie danej 
+        zachodzi albo w opróżnianym elemencie albo we wstawianym (w zależności gdzie 'wypada' miejsce wskazane przez indeks). 
+        Podanie indeksu większego od aktualnej liczby elementów listy skutkuje dodaniem elementu na końcu listy."""
+        #print("Inserting")
+        if index < len(self):
+            #print("index < capacity and index < len(self)")
+            self.insert2tab(data, index)
+        elif self.tab_[-1] is None and self.next_ is None:
+            #print("Append")
+            self.append_forNone(data)
+        elif index > len(self):
+            if self.next_ is None:
+                #print("Simple append")
+                self.tab_.append(data)
             else:
-                new_node.insert_in_node(child.keys[0], child.children[0])
-                self.children[-1] = child.children[1]
+                self.next_.insert(data, index-len(self))
 
-        return key_to_parent, new_node
+        self.delete_overflow()
+
+        
+
+
+        # if len(self.keys) >= self.max_children-1:
+        #     mid = self.max_children//2 #MOŻNA ZMIENIĆ
+        #     self.keys = [self.keys[mid]]
+
+        print(self.tab_)
+            
+        
+
+    
 
 
 class BTree:
     def __init__(self, max_children):
         self.max_children = max_children
-        self.root = BTreeNode(max_children)
+        self.root = Node(max_children)
     
     def insert(self, key):
-        new_node = self._insert(self.root, key)
-        if new_node is not None:
-            new_root = BTreeNode(self.max_children)
-            new_root.keys[0] = new_node[0]
-            new_root.children[0] = self.root
-            new_root.children[1] = new_node[1]
-            self.root = new_root
-        
-    def _insert(self, node: BTreeNode, key):
-        if node.children[0] is None:
-            node.insert_in_node(key)
-            if node.is_full():
-                return node.split_node(None)
-            else:
-                return None
-            
-        i = node.size-1
-        while i>=0 and node.keys[i]>key:
-            i -= 1
-            
-        new_node = self._insert(node.children[i+1], key)
-        if new_node is None:
-            return None
-        
-        node.insert_in_node(new_node[0], new_node[1])
-        if node.is_full():
-            return node.split_node(None)
-        else:
-            return None
-        
-        i = node.size-1
-        while i>=0 and node.keys[i]>key:
-            i -= 1
-        
-        new_node = self._insert(node.children[i+1], key)
-        if new_node is None:
-            return None
-        
-        node.insert_in_node(new_node[0], new_node[1])
-        return node.split_node(None, new_node[1])
+        self.root.insert(key)
     
-    def print_tree(self):
-        print("==============")
-        self._print_tree(self.root, 0)
-        print("==============")
+    # def print_tree(self):
+    #     print("==============")
+    #     self._print_tree(self.root, 0)
+    #     print("==============")
     
-    def _print_tree(self, node: BTreeNode, lvl):
-        if node is not None:
-            for i in range(node.size+1):                    
-                self._print_tree(node.children[i], lvl+1)
-                if i<node.size:
-                    print(lvl*'  ', node.keys[i])
+    # def _print_tree(self, node: Node, lvl):
+    #     if node is not None:
+    #         for i in range(node.size+1):                    
+    #             self._print_tree(node.children[i], lvl+1)
+    #             if i<node.size:
+    #                 print(lvl*'  ', node.keys[i])
 
 
     
@@ -114,7 +110,7 @@ if __name__ == "__main__":
     for key in keys:
         btree.insert(key)
     # wyświetl drzewo
-    btree.print_tree()
+    # btree.print_tree()
     # utwórz drugie puste drzewo, dodaj do niego 20 kolejnych liczb od 0 do 19 (będą to te same liczby co w liście ale dodane w kolejności rosnącej)
     # btree2 = BTree(4)
     # for i in range(20):
