@@ -71,7 +71,7 @@ class matGraf():
     
     # neighboursIdx(vertex_idx) - zwraca listę indeksów węzłów przyległych do węzła o podanym indeksie (połączenia wyjściowe) LUB
     def neighboursIdx(self, vertex_idx):
-        raise NotImplementedError()
+        return list(self.prox_matrix[vertex_idx])
     
     # neighbours(vertex_idx) - zwraca listę węzłów przyległych do węzła o podanym indeksie (połączenia wyjściowe)
     def neighbours(self, vertex_idx):

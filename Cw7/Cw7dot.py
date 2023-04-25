@@ -1,4 +1,3 @@
-import numpy as np
 import polska as pl
 
 class Vertex():
@@ -101,16 +100,50 @@ class lstGraf():
         return lst
     
 
+def choose_color(graf: lstGraf, index, kolory):
+    neigh_colors = []
+    for neigh_idx in graf.neighboursIdx(index):
+        if neigh_idx in kolory:
+            neigh_colors.append(kolory[neigh_idx])
+    neigh_colors = set(neigh_colors)
+    i = 0
+    while i in neigh_colors:
+        i+=1
+    kolory[index] = i
+    
+def koloruj_graf(graf: lstGraf, DFS: bool = False) -> dict:
+    kolory = dict()
+    kolejka = []
+    met = set()
+    kolejka.append(0)
+    while len(kolejka):
+        node_idx = kolejka.pop() if DFS else kolejka.pop(0)
+        met.add(node_idx)
+        choose_color(graf, node_idx, kolory)
+        for neigh_idx in graf.neighboursIdx(node_idx):
+            if neigh_idx not in met:
+                kolejka.append(neigh_idx)
+    return kolory
+
+
 if __name__ == "__main__":
-    print(Vertex('K', pl.slownik['K']) == Vertex('Z', pl.slownik['Z']))
-    listgraf = lstGraf()
+    matrixgraf = lstGraf()
     for woj in pl.slownik:
         x = Vertex(woj, pl.slownik[woj])
-        listgraf.insertVertex(x)
+        matrixgraf.insertVertex(x)
     for woj in pl.graf:
-        listgraf.insertEdge(Vertex(woj[0], pl.slownik[woj[0]]), Vertex(woj[1], pl.slownik[woj[1]]))
-    listgraf.deleteVertex(Vertex('K', pl.slownik['K']))
-    listgraf.deleteEdge(Vertex('W', pl.slownik['W']), Vertex('E', pl.slownik['E']))
-    #listgraf.deleteEdge(Vertex('E', pl.slownik['E']), Vertex('W', pl.slownik['W']))
-    edges = listgraf.edges()
-    pl.draw_map(edges)
+        matrixgraf.insertEdge(Vertex(woj[0], pl.slownik[woj[0]]), Vertex(woj[1], pl.slownik[woj[1]]))
+    
+    print("Maksymalna liczba kolorów to 4 w obu przypadkach")
+
+    kolory = koloruj_graf(matrixgraf, False)
+    kolory = [(matrixgraf.getVertex(k).key, v) for k, v in kolory.items()]
+    edges = matrixgraf.edges()
+    pl.draw_map(edges, kolory)
+
+    kolory = koloruj_graf(matrixgraf, True)
+    kolory = [(matrixgraf.getVertex(k).key, v) for k, v in kolory.items()]
+    edges = matrixgraf.edges()
+    pl.draw_map(edges, kolory)
+
+    

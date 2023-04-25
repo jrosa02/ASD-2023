@@ -150,11 +150,10 @@ class Kopiec:
 
 def wybier_sort(lst:list):
     for i in range(len(lst)):
-        mint = i
-        for j in range(i-1, len(lst)):
-            if mint > lst[j]:
-                
-        m = lst.index(min(lst[i:]))
+        m = i
+        for j in range(i, len(lst)):
+            if lst[m] > lst[j]:
+                m = j
         lst[m], lst[i] = lst[i], lst[m]
     return lst
 
@@ -199,14 +198,14 @@ if __name__ == "__main__":
     for elem in lst:
         print("(", elem, ")", end = ' ')
     print()
-
+    print("Sortowanie niestabilne")
     
     lst = []
-    for i in range(50):
+    for i in range(10000):
         lst.append(int(random.random() * 100))
 
     t_start = time.perf_counter()
     wybier_sort(lst)   
     t_stop = time.perf_counter()
     print("Czas obliczeń:", "{:.7f}".format(t_stop - t_start))   
-    print(lst)
+    #print(lst)
