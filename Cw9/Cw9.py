@@ -38,8 +38,10 @@ class lstGraf():
     
     def insertEdge(self, vertex1, vertex2, edge = 1):
         """insertEdge(vertex1, vertex2, egde) - wstawia do grafu krawędź pomiędzy podane węzły"""
-           
-        self.prox_list[self.index_dict[vertex1]].append((self.index_dict[vertex2], edge))
+        if (vertex2, edge) in set(self.prox_list[self.index_dict[vertex1]]):
+            self.prox_list[self.index_dict[vertex1]] = (vertex2, edge)
+        else:
+            self.prox_list[self.index_dict[vertex1]].append((self.index_dict[vertex2], edge))
 
     # deleteVertex(vertex) - usuwa podany węzeł
     def deleteVertex(self, vertex):
