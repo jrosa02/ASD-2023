@@ -239,16 +239,18 @@ if __name__ == "__main__":
     for edge in edges:
         if not unfnd.same_components(ord(edge[0]) - 65, ord(edge[1]) - 65):
             unfnd.union_sets(ord(edge[0]) - 65, ord(edge[1]) - 65)
-
+            
+    print(unfnd.same_components(0, 1))
     unionedges = unfnd.ret_edges()
+    edgedict = {(elem[0], elem[1]): elem[2] for elem in edges}
     print(unionedges)
     outedges = []
     summm = 0
-    for edge in edges:
-        if (edge[0], edge[1]) in set(unionedges):
-            summm += edge[2]
-            outedges.append(edge)
-    print(outedges)
+    for unionedge in unionedges:
+        print(unionedge)
+        outedges.append((unionedge[0], unionedge[1], edgedict[unionedge]))
+        summm += edgedict[unionedge]
+
 
         
     
