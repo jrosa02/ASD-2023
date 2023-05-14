@@ -65,8 +65,9 @@ class lstGraf():
         idx1 = self.getVertexIdx(vertex1)
         idx2 = self.getVertexIdx(vertex2)
         
+        #print(self.prox_list[idx1])
         if self.prox_list[idx1] is not None:
-            idx2 = self.prox_list[idx1].index(idx2)
+            idx2 = [x[0] for x in self.prox_list[idx1]].index(idx2)
             self.prox_list[idx1].pop(idx2)
 
     # Dodatkowo przydatne będą metody metody:
@@ -110,7 +111,9 @@ class lstGraf():
         lst = list()
         if not directed:
             for i in range(len(self.prox_list)):
-                for somsiad_idx in self.prox_list[i][0]:
+                for somsiad_idx in self.prox_list[i]:
+                        if self.getVertex(i).key == 856:
+                            print(somsiad_idx)
                         lst.append((self.getVertex(i).key, self.getVertex(somsiad_idx[0]).key, somsiad_idx[1]))
         return lst
     
@@ -186,6 +189,6 @@ if __name__ == "__main__":
     printGraph(listgraf)
 
     newlistgraf = PrimaDżewo(listgraf, 0)
-
+    #print(newlistgraf[0].edges())
     printGraph(newlistgraf[0])
     print("Sum of edges = ",newlistgraf[1])
