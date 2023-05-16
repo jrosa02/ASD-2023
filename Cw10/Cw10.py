@@ -16,6 +16,9 @@ class Vertex():
     def __str__(self) -> str:
         return str(self.key) + ": " + str(self.data)
     
+    def __repr__(self) -> str:
+        return str(self.key) + ": " + str(self.data)
+    
 class Edge():
     def __init__(self, capacity, isresidual) -> None:
         self.capacity: float = capacity
@@ -24,7 +27,7 @@ class Edge():
         self.isResidual: bool = isresidual
 
     def __repr__(self) -> str:
-        return str(self.capacity) + " " + str(self.flow) + " " + str(self.residual) + " " + str(self.isResidual)
+        return " " + str(self.capacity) + " " + str(self.flow) + " " + str(self.residual) + " " + str(self.isResidual)
 
 
 class lstGraf():
@@ -116,6 +119,9 @@ class lstGraf():
     def size(self, directed: bool = False):
         """size() - zwraca rozmiar grafu (liczbę krawędzi)"""
         raise NotImplementedError()
+    
+    def getEdge(self, vertex1_idx, vertex2_idx) -> Edge:
+        return [x[1] for x in self.prox_list[vertex1_idx] if x[0] == vertex2_idx][0]
      
     def edges(self, directed: bool = False):
         """edges() - zwracająca wszystkie krawędzie grafu w postaci listy par: (klucz_węzła_początkowego, klucz_węzła_końcowego) 
@@ -147,38 +153,43 @@ def printGraph(g: lstGraf):
 
 
 def traverse(graf: lstGraf, start_idx):
-    kolejka = []
-    met = set([start_idx])
+    stack = [start_idx]
+    met = set()
     parent = [None for x in range(graf.order())]
-    kolejka.append(start_idx)
 
-    while len(kolejka):
-        node_idx = kolejka.pop()
+    while stack:
+        node_idx = stack.pop(0)
+        neighbrs_idx = graf.neighboursIdx(node_idx)
 
-        for neigh_idx_idx in range(len(graf.neighboursIdx(node_idx))):
-            neigh_true_idx = graf.neighboursIdx(node_idx)[neigh_idx_idx]
-
-            if neigh_true_idx not in met and graf.prox_list[node_idx][neigh_idx_idx][1].residual > 0:
-                kolejka.append(neigh_true_idx)
-                met.add(neigh_true_idx)
-                parent[neigh_true_idx] = node_idx
+        for neigh_idx in neighbrs_idx:
+            if neigh_idx not in met and graf.getEdge(node_idx, neigh_idx).residual > 0:
+                stack.append(neigh_idx)
+                met.add(neigh_idx)
+                parent[neigh_idx] = node_idx
                 
     return parent
+    
 
 def min_cap(graf: lstGraf, start_idx, stop_idx, parent):
     current_idx = stop_idx
     min_cap = float('inf')
-    if parent[current_idx] != current_idx:
+
+    if parent[current_idx] is None:
         return 0
+    
     while current_idx != start_idx:
         x = 0
+    
         for neigh_idx, edge in graf.prox_list[parent[current_idx]]:
             if neigh_idx == current_idx and not edge.isResidual:
                 x = (current_idx, edge)
                 break
         min_cap = min([x[1].residual, min_cap])
         current_idx = parent[current_idx]
+    
     return min_cap
+
+
                 
 
 if __name__ == "__main__":
@@ -199,6 +210,6 @@ if __name__ == "__main__":
 
     parent = traverse(listgraf, 0)
     print(parent)
-    mincp = min_cap(listgraf, 0, 4, parent)
+    mincp = min_cap(listgraf, 0, 2, parent)
     print(mincp)
     
