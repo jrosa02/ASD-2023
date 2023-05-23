@@ -214,10 +214,7 @@ class UnionFind():
             lst.append((chr(self.parent[i] + 65), chr(i + 65)))
         return lst
     
-
-if __name__ == "__main__":
-    
-
+def kruskal(graf):
     listgraf = lstGraf()
     for woj in graf:
         x = Vertex(woj[0], "")
@@ -230,42 +227,35 @@ if __name__ == "__main__":
 
     edges = listgraf.edges()
     edges.sort(key= lambda el: el[2])
-    print(edges)
 
     unfnd = UnionFind()
     for i in range(listgraf.order()):
         unfnd.append(i)
 
-    for edge in edges:
-        if not unfnd.same_components(ord(edge[0]) - 65, ord(edge[1]) - 65):
-            unfnd.union_sets(ord(edge[0]) - 65, ord(edge[1]) - 65)
-            
-    print(unfnd.same_components(0, 1))
-    unionedges = unfnd.ret_edges()
     edgedict = {(elem[0], elem[1]): elem[2] for elem in edges}
-    print(unionedges)
-    outedges = []
     summm = 0
-    for unionedge in unionedges:
-        print(unionedge)
-        outedges.append((unionedge[0], unionedge[1], edgedict[unionedge]))
-        summm += edgedict[unionedge]
-
-
-        
-    
     outlistgraf = lstGraf()
+
     for woj in graf:
         x = Vertex(woj[0], "")
         y = Vertex(woj[1], "")
         outlistgraf.insertVertex(x)
         outlistgraf.insertVertex(y)
 
-    for woj in outedges:
-        x = Vertex(woj[0], "")
-        y = Vertex(woj[1], "")
-        outlistgraf.insertEdge(x, y, woj[2])
+    for edge in edges:
+        if not unfnd.same_components(ord(edge[1]) - 65, ord(edge[0]) - 65):
+            unfnd.union_sets(ord(edge[1]) - 65, ord(edge[0]) - 65)
+            x = Vertex(edge[0], "")
+            y = Vertex(edge[1], "")
+            outlistgraf.insertEdge(x, y, edge[2])
+            outlistgraf.insertEdge(y, x, edge[2])
+            summm += edge[2]
 
     printGraph(outlistgraf)
     print("Summ = ",summm)
+
+if __name__ == "__main__":
+    kruskal(graf)
+
+
 
