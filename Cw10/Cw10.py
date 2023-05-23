@@ -190,26 +190,49 @@ def min_cap(graf: lstGraf, start_idx, stop_idx, parent):
     return min_cap
 
 
+def path_augmentation(graf: lstGraf, startidx, endidx, parent, min_capacity):
+    current = endidx
+    while current != startidx:
+        graf.getEdge(parent[current], current).flow += min_capacity
+        graf.getEdge(parent[current], current).residual -= min_capacity
+        graf.getEdge(current, parent[current]).residual += min_capacity
+
+        current = parent[current]
+
+def ff(graf: lstGraf, startidx, endidx):
+    
+    max_flow = 0.0
+    parent = traverse(graf, startidx)
+    maicap = min_cap(graf, startidx, endidx, parent)
+
+    while maicap > 0:
+
+        max_flow += maicap
+        path_augmentation(graf, startidx, endidx, parent, maicap)
+        parent = traverse(graf, startidx)
+        maicap = min_cap(graf, startidx, endidx, parent)
+
+    return max_flow
                 
 
 if __name__ == "__main__":
-    graf_0 = [ ('s','u',2), ('u','t',1), ('u','v',3), ('s','v',1), ('v','t',2)]
-    graf_1 = [ ('s', 'a', 16), ('s', 'c', 13), ('a', 'c', 10), ('c', 'a', 4), ('a', 'b', 12), ('b', 'c', 9), ('b', 't', 20), ('c', 'd', 14), ('d', 'b', 7), ('d', 't', 4) ]
-    graf_2 = [ ('s', 'a', 3), ('s', 'c', 3), ('a', 'b', 4), ('b', 's', 3), ('b', 'c', 1), ('b', 'd', 2), ('c', 'e', 6), ('c', 'd', 2), ('d', 't', 1), ('e', 't', 9)]
-    graf_3 = [('s', 'a', 8), ('s', 'd', 3), ('a', 'b', 9), ('b', 'd', 7), ('b', 't', 2), ('c', 't', 5), ('d', 'b', 7), ('d', 'c', 4)]
+    grafs = []
+    grafs.append([ ('s','u',2), ('u','t',1), ('u','v',3), ('s','v',1), ('v','t',2)])
+    grafs.append([ ('s', 'a', 16), ('s', 'c', 13), ('a', 'c', 10), ('c', 'a', 4), ('a', 'b', 12), ('b', 'c', 9), ('b', 't', 20), ('c', 'd', 14), ('d', 'b', 7), ('d', 't', 4) ])
+    grafs.append([ ('s', 'a', 3), ('s', 'c', 3), ('a', 'b', 4), ('b', 's', 3), ('b', 'c', 1), ('b', 'd', 2), ('c', 'e', 6), ('c', 'd', 2), ('d', 't', 1), ('e', 't', 9)])
+    grafs.append([('s', 'a', 8), ('s', 'd', 3), ('a', 'b', 9), ('b', 'd', 7), ('b', 't', 2), ('c', 't', 5), ('d', 'b', 7), ('d', 'c', 4)])
 
-    listgraf = lstGraf()
-    lst_rdges = []
-    for woj in graf_1:
-        x = Vertex(woj[0], "")
-        y = Vertex(woj[1], "")
-        val = woj[2]
-        listgraf.insertVertex(x)
-        listgraf.insertVertex(y)
-        listgraf.insertEdge(x, y, Edge(val, False))
+    for graf in grafs:
+        listgraf = lstGraf()
+        lst_rdges = []
+        for woj in graf:
+            x = Vertex(woj[0], "")
+            y = Vertex(woj[1], "")
+            val = woj[2]
+            listgraf.insertVertex(x)
+            listgraf.insertVertex(y)
+            listgraf.insertEdge(x, y, Edge(val, False))
 
-    parent = traverse(listgraf, 0)
-    print(parent)
-    mincp = min_cap(listgraf, 0, 2, parent)
-    print(mincp)
+        print(ff(listgraf, listgraf.getVertexIdx(Vertex('s', "")), listgraf.getVertexIdx(Vertex('t', ""))))
+        printGraph(listgraf)
     
