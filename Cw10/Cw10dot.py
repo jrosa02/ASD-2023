@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+import cv2
 
 class Vertex():
     def __init__(self, key, data) -> None:
@@ -168,6 +170,25 @@ def traverse(graf: lstGraf, start_idx):
                 parent[neigh_idx] = node_idx
                 
     return parent
+
+def traverse_cut(graf: lstGraf, start_idx):
+    stack = [start_idx]
+    met = set()
+    parent = [None for x in range(graf.order())]
+    edgers = []
+
+    while stack:
+        node_idx = stack.pop(0)
+        neighbrs_idx = graf.neighboursIdx(node_idx)
+
+        for neigh_idx in neighbrs_idx:
+            if neigh_idx not in met and graf.getEdge(node_idx, neigh_idx).residual > 0:
+                stack.append(neigh_idx)
+                met.add(neigh_idx)
+                parent[neigh_idx] = node_idx
+            if not graf.getEdge(node_idx, neigh_idx).isResidual and graf.getEdge(node_idx, neigh_idx).flow == 0:
+                
+    return parent, edgers
     
 
 def min_cap(graf: lstGraf, start_idx, stop_idx, parent):
@@ -214,6 +235,8 @@ def ff(graf: lstGraf, startidx, endidx):
 
     return max_flow
                 
+def min_cut(graf: lstGraf, source_idx: int, sink_idx: int):
+    parent = traverse(graf, source_idx)
 
 if __name__ == "__main__":
     grafs = []
