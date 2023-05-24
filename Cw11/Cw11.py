@@ -108,29 +108,133 @@ class matGraf():
     def __repr__(self) -> str:
         return str(self.prox_matrix)
     
-def ullman_rek(row, M:np.ndarray, usedcolls: set, mat_P, mat_G, ret_val: list = [], no_rec:int = 0):
+def ullman_rek1(row, M:np.ndarray, usedcolls: set, mat_P, mat_G, ret_val: list = [], no_rec:int = 0) -> int:
+    no_rec += 1
     if row == M.shape[0]:
         if not (mat_P - M@(M@mat_G).T).any():
             #print(M)
             ret_val.append(M)
-        return
+        return no_rec
+    
     for col in range(M.shape[1]):
         if not col in usedcolls:
             usedcolls.add(col)
             for col1 in range(M.shape[1]):
                 M[row, col1] = 0
             M[row, col] = 1
-            ullman_rek(row+1, M.copy(), usedcolls, mat_P, mat_G, ret_val, no_rec + 1)
+            no_rec = ullman_rek1(row+1, M.copy(), usedcolls, mat_P, mat_G, ret_val, no_rec)
             usedcolls.discard(col)
-
+    return no_rec
     
-def ullman(mgraf_G: matGraf, mgraf_P: matGraf):
+def find_fitting1(mgraf_G: matGraf, mgraf_P: matGraf):
+    print("\tUlmann 1.0")
+    mx_P = mgraf_P.prox_matrix.astype(int)
+    mx_G =mgraf_G.prox_matrix.astype(int)
     M = np.zeros((mgraf_P.prox_matrix.shape[0], mgraf_G.prox_matrix.shape[1]))
+    for i in range(M.shape[0]):
+        degvi = np.count_nonzero(mx_P[i, :])
+        for j in range(M.shape[0]):
+            degvj = np.count_nonzero(mx_G[j, :])
     Ms = list()
-    no_rec = ullman_rek(0, M, set(), mgraf_P.prox_matrix, mgraf_G.prox_matrix, Ms, 0)
-    print(Ms)
-    print(no_rec)
+    no_rec = ullman_rek1(0, M, set(), mgraf_P.prox_matrix, mgraf_G.prox_matrix, Ms, 0)
+    print(f"Ilość rekurencji: {no_rec}, Znalezione izomorfizmy: {len(Ms)}")
+    
 
+
+def ullman_rek2(row, M:np.ndarray, usedcolls: list, mat_P, mat_G, ret_val: list = [], no_rec:int = 0, M0 = None) -> int:
+    M0 = M0 if M0 is not None else M
+    no_rec += 1
+    if row == M.shape[0]:
+        if not (mat_P - M@(M@mat_G).T).any():
+            #print(M)
+            ret_val.append(M)
+        return no_rec
+
+    for col in range(M.shape[1]):
+        if not col in usedcolls:
+            if M0[row, col]:
+                usedcolls.append(col)
+                for col1 in range(M.shape[1]):
+                    M[row, col1] = 0
+                M[row, col] = 1
+                no_rec = ullman_rek2(row+1, M.copy(), usedcolls, mat_P, mat_G, ret_val, no_rec, M0)
+                usedcolls.remove(col)
+    return no_rec
+    
+def find_fitting2(mgraf_G: matGraf, mgraf_P: matGraf):
+    print("\tUlmann 2.0")
+    mx_P = mgraf_P.prox_matrix.astype(int)
+    mx_G =mgraf_G.prox_matrix.astype(int)
+    M = np.zeros((mgraf_P.prox_matrix.shape[0], mgraf_G.prox_matrix.shape[1]))
+    M0 = np.zeros((mgraf_P.prox_matrix.shape[0], mgraf_G.prox_matrix.shape[1]))
+    for i in range(M.shape[0]):
+        degvi = np.count_nonzero(mx_P[i, :])
+        for j in range(M.shape[1]):
+            degvj = np.count_nonzero(mx_G[j, :])
+            M0[i][j] = 1 if degvi <= degvj else 0
+    Ms = list()
+    no_rec = ullman_rek2(0, M, [], mgraf_P.prox_matrix, mgraf_G.prox_matrix, Ms, 0, M0)
+    print(f"Ilość rekurencji: {no_rec}, Znalezione izomorfizmy: {len(Ms)}")
+
+def prune(M:np.ndarray ,P: np.ndarray, G:np.ndarray):
+    M = M.astype(int)
+    change = True
+    while change:
+        change = False
+        for i in range(M.shape[0]):
+            for j in range(M.shape[1]):
+                if M[i, j]:
+                    n_ex = False
+                    for x in range(P.shape[1]):
+                        for y in range(G.shape[1]):
+                            if M[x, y]:
+                                n_ex = True
+                                break
+                        if n_ex:
+                            break
+                    if not n_ex:
+                        M[i, j] = 0
+                        change = True
+                        break
+
+    return M
+
+def ullman_rek3(row, M:np.ndarray, usedcolls: list, mat_P, mat_G, ret_val: list = [], no_rec:int = 0, M0 = None) -> int:
+    M0 = M0 if M0 is not None else M
+    no_rec += 1
+    if row == M.shape[0]:
+        if not (mat_P - M@(M@mat_G).T).any():
+            #print(M)
+            ret_val.append(M)
+        return no_rec
+
+    M = prune(M, mat_P, mat_G)
+    
+    for col in range(M.shape[1]):
+        if not col in usedcolls:
+            if M0[row, col]:
+                usedcolls.append(col)
+                for col1 in range(M.shape[1]):
+                    M[row, col1] = 0
+                M[row, col] = 1
+                no_rec = ullman_rek3(row+1, M.copy(), usedcolls, mat_P, mat_G, ret_val, no_rec, M0)
+                usedcolls.remove(col)
+    return no_rec
+    
+def find_fitting3(mgraf_G: matGraf, mgraf_P: matGraf):
+    print("\tUlmann 3.0")
+    mx_P = mgraf_P.prox_matrix.astype(int)
+    mx_G =mgraf_G.prox_matrix.astype(int)
+    M = np.zeros((mgraf_P.prox_matrix.shape[0], mgraf_G.prox_matrix.shape[1]))
+    M0 = np.zeros((mgraf_P.prox_matrix.shape[0], mgraf_G.prox_matrix.shape[1]))
+    for i in range(M.shape[0]):
+        degvi = np.count_nonzero(mx_P[i, :])
+        for j in range(M.shape[1]):
+            degvj = np.count_nonzero(mx_G[j, :])
+            M0[i][j] = 1 if degvi <= degvj else 0
+    Ms = list()
+    no_rec = ullman_rek3(0, M, [], mgraf_P.prox_matrix, mgraf_G.prox_matrix, Ms, 0, M0)
+    print(f"Ilość rekurencji: {no_rec}, Znalezione izomorfizmy: {len(Ms)}")
 
 
 def main():
@@ -139,19 +243,15 @@ def main():
     matrixgraf_G = matGraf()
     matrixgraf_P = matGraf()
 
-    for woj in graph_G:
-        x = Vertex(woj[0], "")
-        y = Vertex(woj[1], "")
+    for woj in "ABCDEF":
+        x = Vertex(woj, "")
         matrixgraf_G.insertVertex(x)
-        matrixgraf_G.insertVertex(y)
     for woj in graph_G:
         matrixgraf_G.insertEdge(Vertex(woj[0], ""), Vertex(woj[1], ""), woj[2])
         matrixgraf_G.insertEdge(Vertex(woj[1], ""), Vertex(woj[0], ""), woj[2])
 
-    for woj in graph_P:
-        x = Vertex(woj[0], "")
-        y = Vertex(woj[1], "")
-        matrixgraf_P.insertVertex(x)
+    for woj in "ABC":
+        y = Vertex(woj, "")
         matrixgraf_P.insertVertex(y)
     for woj in graph_P:
         matrixgraf_P.insertEdge(Vertex(woj[0], ""), Vertex(woj[1], ""), woj[2])
@@ -160,7 +260,9 @@ def main():
     #print(matrixgraf_P)
     #print(matrixgraf_G)
 
-    ullman(matrixgraf_G, matrixgraf_P)
+    find_fitting1(matrixgraf_G, matrixgraf_P)
+    find_fitting2(matrixgraf_G, matrixgraf_P)
+    find_fitting3(matrixgraf_G, matrixgraf_P)
 
 
 if __name__ == "__main__":
