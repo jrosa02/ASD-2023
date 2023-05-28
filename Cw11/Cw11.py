@@ -184,15 +184,15 @@ def prune(M:np.ndarray ,P: np.ndarray, G:np.ndarray):
         for i in range(M.shape[0]):
             for j in range(M.shape[1]):
                 if M[i, j]:
-                    n_ex = False
+                    nnnnx = False
                     for x in range(P.shape[1]):
                         for y in range(G.shape[1]):
                             if M[x, y]:
-                                n_ex = True
+                                nnnnx = True
                                 break
-                        if n_ex:
+                        if nnnnx:
                             break
-                    if not n_ex:
+                    if not nnnnx:
                         M[i, j] = 0
                         change = True
                         break
