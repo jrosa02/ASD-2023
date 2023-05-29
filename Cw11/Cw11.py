@@ -176,41 +176,54 @@ def find_fitting2(mgraf_G: matGraf, mgraf_P: matGraf):
     no_rec = ullman_rek2(0, M, [], mgraf_P.prox_matrix, mgraf_G.prox_matrix, Ms, 0, M0)
     print(f"Ilość rekurencji: {no_rec}, Znalezione izomorfizmy: {len(Ms)}")
 
-def prune(M:np.ndarray ,P: np.ndarray, G:np.ndarray):
-    M = M.astype(int)
-    change = True
-    while change:
-        change = False
-        for i in range(M.shape[0]):
-            for j in range(M.shape[1]):
-                if M[i, j]:
-                    nnnnx = False
-                    for x in range(P.shape[1]):
-                        for y in range(G.shape[1]):
-                            if M[x, y]:
-                                nnnnx = True
-                                break
-                        if nnnnx:
+
+def prune(M, P, G):
+    for row in range(M.shape[0]):
+        for col in range(M.shape[1]):
+
+            if M[row, col] == 1:
+                p_lst = []
+                g_lst = []
+
+                for p_col in range(P.shape[0]):
+                    if P[row, p_col] == 1:
+                        p_lst.append(p_col)
+                for g_col in range(G.shape[0]):
+                    if G[col, g_col] == 1:
+                        g_lst.append(g_col)
+
+                for x in p_lst:
+                    changed = False
+                    for y in g_lst:
+                        if M[x, y] == 1:
+                            changed = True
                             break
-                    if not nnnnx:
-                        M[i, j] = 0
-                        change = True
+                    if changed:
                         break
 
-    return M
+                else:
+                    M[row, col] = 0
+                    return True
+    return False
 
 def ullman_rek3(row, M:np.ndarray, usedcolls: list, mat_P, mat_G, ret_val: list = [], no_rec:int = 0, M0 = None) -> int:
     M0 = M0 if M0 is not None else M
     no_rec += 1
+
+    x = False
+
+    if row == M.shape[0] - 1:
+        x = prune(M.copy(), mat_P, mat_G)
+
     if row == M.shape[0]:
         if not (mat_P - M@(M@mat_G).T).any():
             #print(M)
             ret_val.append(M)
         return no_rec
 
-    M = prune(M, mat_P, mat_G)
-    
     for col in range(M.shape[1]):
+        if x and row:
+            break
         if not col in usedcolls:
             if M0[row, col]:
                 usedcolls.append(col)
