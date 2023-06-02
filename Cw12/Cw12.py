@@ -4,30 +4,37 @@ def naiwe(S: str, W: str):
     t_start = time.perf_counter()
     counter = 0
     outlist = []
-    for m in range(len(S)):
+    M = len(S)
+    N = len(W)
+    m = 0
+    while m < M:
         ok = True
-        for i in range(len(W)):
+        n = 0
+        while n < N:
             counter += 1
-            if S[m+i] != W[i]:
+            if S[m+n] != W[n]:
                 ok = False
                 break
+            n += 1
         if ok:
             outlist.append(m)
+            m += N
+        else:
+            m += 1
 
     t_stop = time.perf_counter()
     return (len(outlist), t_stop-t_start, counter)
 
 
-def hash(word, d=256, q=101):
+def hash(word: str, d=256, q=101):
     hw = 0
-    for i in range(len(word)):  # N - to długość wzorca
+    N = len(word)
+    for i in range(N):  # N - to długość wzorca
         hw = (hw*d + ord(word[i])) % q  # dla d będącego potęgą 2 można mnożenie zastąpić shiftem uzyskując pewne przyspieszenie obliczeń
     return hw
 
 
 def Rabin_karp(S: str, W: str):
-
-    
     M = len(S)
     N = len(W)
     hS = hash(S[:N])
@@ -56,6 +63,7 @@ def Rabin_karp(S: str, W: str):
 
     return (len(outlist), collision, counter)
     
+
 def KMP_T(W: str) -> list:
 
     # an array of integers, T (the table to be filled)
@@ -66,23 +74,52 @@ def KMP_T(W: str) -> list:
     cnd = 0
     N = len(W)
     T = [0 for _ in range(N + 1)]
-
+    counter = 0
     # let T[0] ← -1
     T[0] = -1
     while pos < len(W):
+        counter += 1
         if W[pos] == W[cnd]:
             T[pos] = T[cnd]
         else:
             T[pos] = cnd
+            counter += 1
             while cnd >= 0 and W[pos] != W[cnd]:
+                counter += 1
                 cnd = T[cnd]
         pos = pos + 1
         cnd = cnd + 1
     T[pos] = cnd
-    return T
+    return T, counter
 
-def KMP(S:str, W:str):
-    pass
+
+def KMP_S(S:str, W:str):
+    t_start = time.perf_counter()
+    M = len(S)
+    N = len(W)
+    P = []
+    nP = 0
+    m = 0
+    i = 0
+    T, counter = KMP_T(W)
+
+    while m < M:
+        counter += 1
+        if W[i] == S[m]:
+            m += 1
+            i += 1
+            if i == N:
+                P.append(m)
+                nP += 1
+                i = T[i]
+        else:
+            i = T[i]
+            if i < 0:
+                m += 1
+                i += 1
+    t_stop = time.perf_counter()
+    return nP, counter, T
+
 
 
 def main():
@@ -92,11 +129,11 @@ def main():
     S = ' '.join(text).lower()
 
     output = naiwe(S, "time.")
-    print(f"Number: {output[0]}, elapsed time: {output[1]*1e3:.0f} ms, counter {output[2]}")
+    print(f"{output[0]}; {output[2]}")
     output = Rabin_karp(S, "time.")
-    print(f"Number: {output[0]}, collisions: {output[1]}, counter {output[2]}")
-    T = KMP_T("tite.")
-    print(T)
+    print(f"{output[0]}; {output[2]}; {output[1]}")
+    output = KMP_S(S, "time.")
+    print(f"{output[0]}; {output[1]}; {output[2]}")
 
 
 
