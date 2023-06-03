@@ -18,9 +18,7 @@ def naiwe(S: str, W: str):
             n += 1
         if ok:
             outlist.append(m)
-            m += N
-        else:
-            m += 1
+        m += 1
 
     t_stop = time.perf_counter()
     return (len(outlist), t_stop-t_start, counter)
