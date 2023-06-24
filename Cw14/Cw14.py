@@ -11,35 +11,61 @@ def find_leftmost(zbior_pkt: list):
             p = pkt
     return p
 
+
+def among_us(p1, p2, p3):
+    isValid = False
+
+    for i in [-1, 1]:
+
+        for j in [-1, 1]:
+
+            if (p1[0]*i < p2[0]*i < p3[0]*i) or (p1[1]*j < p2[1]*j < p3[1]*j):
+                isValid = True
+
+    return isValid
+
+
 def find_next(p, zbior_pkt: list):
-    for prop_q in zbior_pkt:
-        if prop_q != p:
-            isValid = True
+    q = zbior_pkt[(zbior_pkt.index(p) + 1) % len(zbior_pkt)]
+    for r in zbior_pkt:
+        sk = skret(p, r , q)
+        if sk < 0:
+            q = r
 
-            for r in zbior_pkt:
-                #for all r p-q-r should be left
-                if r != prop_q and r != p:
-                    if skret(p, prop_q, r) > 0:
-                        isValid = False
-                        break
-                    elif skret(p, prop_q) == 0:
-                        return
+    return q
 
-            if isValid:
-                return prop_q
-        
-    return None
+def find_next2(p, zbior_pkt: list):
+    q = zbior_pkt[(zbior_pkt.index(p) + 1) % len(zbior_pkt)]
+    for r in zbior_pkt:
+        sk = skret(p, r , q)
+        if sk < 0:
+            q = r
+        elif sk == 0 and among_us(p, q, r):
+            q = r
+
+    return q
 
 
-def jarvis(zbior_pkt: list):
+def jarvis1(zbior_pkt: list):
     p = find_leftmost(zbior_pkt)
-    first_p = p
-    path = [p]
+    path = []
+    q = p
 
-    while not (len(path) > 1 and path[-1] == path[0]):
-        q = find_next(p, zbior_pkt)
+    while not (len(path) > 1 and q == path[0]):
         path.append(q)
         p = q
+        q = find_next(p, zbior_pkt)  
+    return path
+
+def jarvis2(zbior_pkt: list):
+    p = find_leftmost(zbior_pkt)
+    path = []
+    q = p
+
+    while not (len(path) > 1 and q == path[0]):
+        path.append(q)
+        p = q
+        q = find_next2(p, zbior_pkt)  
     return path
 
 def unzip(list_tuples):
@@ -51,13 +77,17 @@ def unzip(list_tuples):
 def main():
     plot = False
     t1 =  [(0, 3), (0, 0), (0, 1), (3, 0), (3, 3)]
+    t2 = [(0, 3), (0, 1), (0, 0), (3, 0), (3, 3)]
+    t3 = [(2, 2), (4, 3), (5, 4), (0, 3), (0, 2), (0, 0), (2, 1), (2, 0), (4, 0)]
     if plot:
         plt.figure()
-        plt.scatter(unzip(t1)[0], unzip(t1)[1])
-        plt.waitforbuttonpress(10)
-    t2 = [(0, 3), (0, 1), (0, 0), (3, 0), (3, 3)]
-    print(jarvis(t1)) 
-    print(jarvis(t2))
+        plt.scatter(unzip(t3)[0], unzip(t3)[1])
+        plt.waitforbuttonpress(15)
+    
+
+
+    print(jarvis1(t3))
+    print(jarvis2(t3))
 
 if __name__ == "__main__":
     main()
